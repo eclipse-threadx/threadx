@@ -1,0 +1,151 @@
+name: module_qemu
+
+# Copyright (c) 2026 Eclipse ThreadX contributors
+# SPDX-License-Identifier: MIT
+# Portions of this file were generated with AI assistance.
+#
+# Builds the module execution harness in test/tx/cmake/module_qemu for each
+# Cortex-M module port it covers and EXECUTES every image on QEMU's MPS2
+# board for that core, asserting each image's self-reported result.
+#
+# Why this exists: until this workflow landed, no Cortex-M module port ran in
+# CI. gcc_check compiles the module manager sources once per port and links
+# nothing that loads a module; the host tests under test/tx/module_manager
+# compile a handful of portable module manager sources against stubs. A
+# module's start-up, its kernel calls through the supervisor call, the MPU
+# programming on every context switch and the fault path that terminates a
+# misbehaving module are only exercised by executing them, and r52_fvp does
+# that for the Cortex-R52 alone.
+#
+# What it covers, per port:
+#
+#   - cortex_m3 on mps2-an385 and cortex_m4 on mps2-an386, the latter built
+#     for its FPU with the hard-float ABI;
+#   - a protected module loaded, started, exercising the kernel, stopped and
+#     unloaded twice, with its memory given back;
+#   - a protected module faulting on a read of kernel memory, reported to the
+#     application and terminated -- which is also the proof that QEMU's MPU is
+#     enforcing at all;
+#   - the same module built privileged and unprotected, whose identical read
+#     succeeds.
+#
+# QEMU comes from the Ubuntu archive. The images report through semihosting
+# and end the simulation themselves, so a hang shows up as the runner's
+# timeout rather than as a pass.
+
+on:
+  # push as well as pull_request, for the reason gcc_check.yml states at
+  # length: dev needs its own baseline so a bad squash-merge is caught then
+  # rather than by whoever opens the next pull request.
+  push:
+    branches: [ master, dev ]
+    paths:
+      - ".github/workflows/module_qemu.yml"
+      - "common/**"
+      - "common_modules/**"
+      - "ports_module/cortex_m3/**"
+      - "ports_module/cortex_m4/**"
+      - "test/tx/cmake/module_qemu/**"
+      - "scripts/tx_ci_common.sh"
+  pull_request:
+    branches: [ master, dev ]
+    # Duplicated rather than shared through a YAML anchor, as in r52_fvp.yml.
+    # **Edit both.**
+    paths:
+      - ".github/workflows/module_qemu.yml"
+      - "common/**"
+      - "common_modules/**"
+      - "ports_module/cortex_m3/**"
+      - "ports_module/cortex_m4/**"
+      - "test/tx/cmake/module_qemu/**"
+      - "scripts/tx_ci_common.sh"
+
+permissions:
+  contents: read
+
+jobs:
+  module_qemu:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    env:
+      # Pinned deliberately and shared with gcc_check.yml, ci_cortex_m.yml and
+      # r52_fvp.yml through one cache entry; change them together.
+      GCC_VERSION: 14.3.rel1
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+    # Path and key match gcc_check.yml's AArch32 entry exactly, so the
+    # workflows share one cache entry.
+    - name: Cache the AArch32 Arm GNU toolchain
+      id: cache-arm32
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: toolchain
+        key: arm-gnu-toolchain-${{ env.GCC_VERSION }}-x86_64-arm-none-eabi
+
+    # The checksum suffix is .sha256asc and not .sha256; see gcc_check.yml.
+    - name: Install the AArch32 Arm GNU toolchain
+      if: steps.cache-arm32.outputs.cache-hit != 'true'
+      run: |
+        set -eu
+        base="https://developer.arm.com/-/media/Files/downloads/gnu/${GCC_VERSION}/binrel"
+        archive="arm-gnu-toolchain-${GCC_VERSION}-x86_64-arm-none-eabi.tar.xz"
+        mkdir -p toolchain && cd toolchain
+        curl -fsSLO "$base/$archive"
+        curl -fsSLO "$base/$archive.sha256asc"
+        sha256sum -c "$archive.sha256asc"
+        tar xf "$archive"
+        rm -f "$archive"
+
+    # Through the bounded, retried apt helpers in tx_ci_common.sh, for the
+    # reasons that file records: on this runner pool a bare apt call can stall
+    # for hours. Ninja is installed only if the image stopped shipping it.
+    - name: Install QEMU
+      run: |
+        set -eu
+        . scripts/tx_ci_common.sh
+        packages="qemu-system-arm"
+        command -v ninja >/dev/null 2>&1 || packages="$packages ninja-build"
+        retry sudo "${TIMEOUT[@]}" apt-get "${APT_OPTIONS[@]}" update || true
+        # shellcheck disable=SC2086
+        retry sudo "${TIMEOUT[@]}" apt-get "${APT_OPTIONS[@]}" install -y --no-install-recommends $packages
+        qemu-system-arm --version | head -1
+
+    - name: Build and run the module harness
+      run: |
+        set -eu
+        export PATH="$GITHUB_WORKSPACE/toolchain/arm-gnu-toolchain-${GCC_VERSION}-x86_64-arm-none-eabi/bin:$PATH"
+        arm-none-eabi-gcc --version | head -1
+
+        status=0
+        for port in cortex_m3 cortex_m4; do
+          build="build/module_qemu_$port"
+          echo ""
+          echo "=============================================================="
+          echo "== $port"
+          echo "=============================================================="
+
+          if ! cmake -S test/tx/cmake/module_qemu -B "$build" -G Ninja \
+                  -DCMAKE_TOOLCHAIN_FILE="$PWD/test/tx/cmake/module_qemu/arm-none-eabi-qemu.cmake" \
+                  -DMODULE_QEMU_PORT="$port"; then
+            echo "::error::$port: CMake configure failed"
+            status=1
+            continue
+          fi
+          if ! cmake --build "$build"; then
+            echo "::error::$port: the images did not build"
+            status=1
+            continue
+          fi
+          # --no-tests=error: the tests are registered only when QEMU and
+          # Python are found, and ctest's default would pass on none.
+          if ! ctest --test-dir "$build" --output-on-failure --no-tests=error; then
+            echo "::error::$port: one or more images failed on QEMU, or no tests were registered"
+            status=1
+          fi
+        done
+
+        exit $status

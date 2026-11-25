@@ -24,6 +24,11 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
+option(TX_ENABLE_POINTER_CONTEXT "Exercise the pointer context APIs" OFF)
+if(TX_ENABLE_POINTER_CONTEXT)
+  add_compile_definitions(TX_ENABLE_POINTER_CONTEXT)
+endif()
+
 # Set build configurations
 set(BUILD_CONFIGURATIONS default_build_coverage disable_notify_callbacks_build
                          stack_checking_build stack_checking_rand_fill_build trace_build
@@ -43,7 +48,7 @@ endif()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Using toolchain file: ${CMAKE_TOOLCHAIN_FILE}.")
-set(default_build_coverage TX_QUEUE_MESSAGE_MAX_SIZE=32)
+set(default_build_coverage TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_MUTEX_INHERIT_CHAIN_MAX=2)
 set(disable_notify_callbacks_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_DISABLE_NOTIFY_CALLBACKS)
 set(stack_checking_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_ENABLE_STACK_CHECKING)
 set(stack_checking_rand_fill_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_ENABLE_STACK_CHECKING TX_ENABLE_RANDOM_NUMBER_STACK_FILLING)
@@ -68,6 +73,12 @@ add_compile_definitions(
   TX_REGRESSION_TEST
   TEST_STACK_SIZE_PRINTF=4096
   ${${CMAKE_BUILD_TYPE}})
+
+# The Windows simulators keep simulated time on the host clock by default. The
+# suite runs them at five ticks per millisecond so long timeouts finish quickly.
+if((THREADX_ARCH STREQUAL "win32") OR (THREADX_ARCH STREQUAL "win64"))
+  add_compile_definitions(TX_TIMER_PERIODIC=1 TX_WIN32_TICKS_PER_INTERRUPT=5)
+endif()
 
 if(MSVC)
   add_compile_options(/W3 /Zi)
@@ -109,8 +120,10 @@ endif()
 
 # Host tests for the Module Manager. Listed after thread_transition for the reason
 # given above it: additions here are appended rather than inserted, so that branches
-# adding a directory of their own merge cleanly.
-if(NOT ("TX_MISRA_ENABLE" IN_LIST ${CMAKE_BUILD_TYPE}))
+# adding a directory of their own merge cleanly. They compile the module ports'
+# headers, which accept only IAR, AC5 and GNU-compatible compilers, so MSVC builds
+# skip them.
+if(NOT MSVC AND NOT ("TX_MISRA_ENABLE" IN_LIST ${CMAKE_BUILD_TYPE}))
   add_subdirectory(module_manager)
 endif()
 
@@ -166,4 +179,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND THREADX_ARCH STREQUAL "linux" AND
    THREADX_TOOLCHAIN STREQUAL "gnu" AND
    CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
   add_subdirectory(thread_stack_alignment)
+endif()
+
+# Port-level tests for the Windows simulators.
+if((THREADX_ARCH STREQUAL "win32") OR (THREADX_ARCH STREQUAL "win64"))
+  add_subdirectory(windows_port)
 endif()

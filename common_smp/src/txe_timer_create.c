@@ -75,6 +75,7 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
+#ifdef TX_ENABLE_POINTER_CONTEXT
 static UINT  _txe_timer_create_initial(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
             VOID (*expiration_function)(ULONG id), ULONG expiration_input,
             VOID (*expiration_function_ptr)(VOID *id), VOID *expiration_input_ptr,
@@ -85,6 +86,11 @@ static UINT  _txe_timer_create_initial(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *
             VOID (*expiration_function)(ULONG id), ULONG expiration_input,
             VOID (*expiration_function_ptr)(VOID *id), VOID *expiration_input_ptr,
             ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate, UINT timer_control_block_size)
+#else
+UINT  _txe_timer_create(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
+            VOID (*expiration_function)(ULONG id), ULONG expiration_input,
+            ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate, UINT timer_control_block_size)
+#endif
 {
 
 TX_INTERRUPT_SAVE_AREA
@@ -229,6 +235,7 @@ TX_THREAD       *thread_ptr;
     {
 
         /* Call actual application timer create function.  */
+#ifdef TX_ENABLE_POINTER_CONTEXT
         if (expiration_function_ptr != TX_NULL)
         {
             status =  _tx_timer_create_ptr(timer_ptr, name_ptr,
@@ -236,6 +243,7 @@ TX_THREAD       *thread_ptr;
                                            initial_ticks, reschedule_ticks, auto_activate);
         }
         else
+#endif
         {
             status =  _tx_timer_create(timer_ptr, name_ptr,
                                        expiration_function, expiration_input,
@@ -246,6 +254,8 @@ TX_THREAD       *thread_ptr;
     /* Return completion status.  */
     return(status);
 }
+
+#ifdef TX_ENABLE_POINTER_CONTEXT
 
 
 /**************************************************************************/
@@ -338,4 +348,4 @@ UINT  _txe_timer_create_ptr(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
                                      initial_ticks, reschedule_ticks, auto_activate,
                                      timer_control_block_size));
 }
-
+#endif /* TX_ENABLE_POINTER_CONTEXT */

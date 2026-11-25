@@ -105,12 +105,14 @@ VOID            (*entry_exit_notify)(TX_THREAD *notify_thread_ptr, UINT type);
 #endif
 
     /* Call current thread's entry function.  */
+#ifdef TX_ENABLE_POINTER_CONTEXT
     if (thread_ptr -> tx_thread_entry_ptr != TX_NULL)
     {
 
         (thread_ptr -> tx_thread_entry_ptr)(thread_ptr -> tx_thread_entry_parameter_ptr);
     }
     else
+#endif
     {
 
         (thread_ptr -> tx_thread_entry)(thread_ptr -> tx_thread_entry_parameter);

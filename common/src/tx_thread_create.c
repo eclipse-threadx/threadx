@@ -77,6 +77,7 @@
 /*    Application Code                                                    */
 /*    _tx_timer_initialize                  Create system timer thread    */
 /*                                                                        */
+#ifdef TX_ENABLE_POINTER_CONTEXT
 static UINT  _tx_thread_create_initial(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
                                        VOID (*entry_function)(ULONG id), ULONG entry_input,
                                        VOID (*entry_function_ptr)(VOID *id), VOID *entry_input_ptr,
@@ -89,6 +90,11 @@ static UINT  _tx_thread_create_initial(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR
                                        VOID (*entry_function_ptr)(VOID *id), VOID *entry_input_ptr,
                                        VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
                                        ULONG time_slice, UINT auto_start)
+#else
+UINT  _tx_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr, VOID (*entry_function)(ULONG id), ULONG entry_input,
+                            VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
+                            ULONG time_slice, UINT auto_start)
+#endif
 {
 
 TX_INTERRUPT_SAVE_AREA
@@ -175,8 +181,10 @@ ULONG                   stack_fill_value;
     thread_ptr -> tx_thread_name =                  name_ptr;
     thread_ptr -> tx_thread_entry =                 entry_function;
     thread_ptr -> tx_thread_entry_parameter =       entry_input;
+#ifdef TX_ENABLE_POINTER_CONTEXT
     thread_ptr -> tx_thread_entry_ptr =             entry_function_ptr;
     thread_ptr -> tx_thread_entry_parameter_ptr =   entry_input_ptr;
+#endif
     thread_ptr -> tx_thread_stack_start =       stack_start;
     thread_ptr -> tx_thread_stack_size =        stack_size;
     thread_ptr -> tx_thread_priority =          priority;
@@ -394,6 +402,8 @@ ULONG                   stack_fill_value;
     return(TX_SUCCESS);
 }
 
+#ifdef TX_ENABLE_POINTER_CONTEXT
+
 
 /**************************************************************************/
 /*                                                                        */
@@ -483,4 +493,4 @@ UINT  _tx_thread_create_ptr(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
                                      stack_start, stack_size, priority, preempt_threshold,
                                      time_slice, auto_start));
 }
-
+#endif /* TX_ENABLE_POINTER_CONTEXT */

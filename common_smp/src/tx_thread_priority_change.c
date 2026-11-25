@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -84,6 +85,7 @@ TX_INTERRUPT_SAVE_AREA
 TX_THREAD       *execute_ptr;
 UINT            core_index;
 UINT            original_priority;
+UINT            mutex_priority_updated;
 UINT            lowest_priority;
 TX_THREAD       *original_pt_thread;
 #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
@@ -112,8 +114,22 @@ UINT            status;
     /* Save the previous priority.  */
     *old_priority =  thread_ptr -> tx_thread_user_priority;
 
+    /* Mutex creation installs the hook before a thread can wait on a mutex.  */
+    mutex_priority_updated =  TX_FALSE;
+    if (thread_ptr -> tx_thread_state == TX_MUTEX_SUSP)
+    {
+        mutex_priority_updated =  (_tx_thread_mutex_priority_update)(thread_ptr, new_priority);
+    }
+
+    if (mutex_priority_updated == TX_TRUE)
+    {
+        TX_RESTORE
+        _tx_thread_system_preempt_check();
+        status =  TX_SUCCESS;
+    }
+
     /* Determine if the new priority is the same as the last requested priority.  */
-    if ((thread_ptr -> tx_thread_user_priority == new_priority) &&
+    else if ((thread_ptr -> tx_thread_user_priority == new_priority) &&
         (thread_ptr -> tx_thread_user_preempt_threshold == new_priority))
     {
 
@@ -128,10 +144,12 @@ UINT            status;
 
     /* Determine if the inherit priority is in effect and there is no preemption-threshold in force.  */
     else if ((thread_ptr -> tx_thread_inherit_priority < new_priority) &&
+             (thread_ptr -> tx_thread_priority == thread_ptr -> tx_thread_inherit_priority) &&
              (thread_ptr -> tx_thread_user_preempt_threshold == thread_ptr -> tx_thread_user_priority))
     {
 
-        /* In this case, simply setup the user priority and preemption-threshold and return.  */
+        /* The effective priority is already the inherited priority. If it were
+           still the old user priority, it would need to change as well. */
 
         /* Setup the new priority for this thread.  */
         thread_ptr -> tx_thread_user_priority =           new_priority;

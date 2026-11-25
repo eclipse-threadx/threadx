@@ -10,8 +10,6 @@
  **************************************************************************/
 
 /* Portions of this file were generated with AI assistance. */
-
-
 /**************************************************************************/
 /**************************************************************************/
 /**                                                                       */
@@ -199,6 +197,14 @@
 #endif
 */
 
+/* Enable tx_thread_create_ptr and tx_timer_create_ptr with VOID * contexts.
+   Use the same setting when building ThreadX and its applications, since
+   this option adds callback storage to TX_THREAD and TX_TIMER.  */
+
+/*
+#define TX_ENABLE_POINTER_CONTEXT
+*/
+
 /* Determine if the notify callback option should be disabled. By default, notify callbacks are
    enabled. If the application does not use notify callbacks, they may be disabled to reduce
    code size and improve performance.  */
@@ -260,6 +266,27 @@
 
 /*
 #define TX_MUTEX_ENABLE_PERFORMANCE_INFO
+*/
+
+/* Enable bounded, bidirectional priority inheritance through mutex chains.
+   Define a nonnegative integer K to visit the first owner and at most K further
+   waiting-mutex edges (K + 1 distinct owners); zero retains a single owner.
+   Get, wait exit, waiter priority change, release and transfer use the same bound.
+   A non-inheriting mutex or inactive mutex wait ends the walk. Cycles wholly
+   contained in the visited path are recomputed from base priorities and outside
+   waiters, without retaining their own obsolete boosts. A cycle extending beyond
+   the bound can still retain an outside cached contribution; configure K to cover
+   the application's longest possible cycle if cycle restoration is required.
+   Work is O(N*N + N*W + M), for N <= K + 1 visited owners, W waiters and M owned
+   mutexes across those owners, plus up to N scheduler priority changes. All graph
+   processing holds interrupt/SMP protection with preemption disabled; the bound
+   alone does not bound list lengths or total interrupt latency. Stack scratch is
+   (K + 1)*(sizeof(TX_THREAD *) + 2*sizeof(UINT)), with no allocation or recursion.
+   When undefined, get retains its existing single-level path and restoration
+   scans only the changed waiter list and the first owner's cached mutex list. */
+
+/*
+#define TX_MUTEX_INHERIT_CHAIN_MAX      8
 */
 
 /* Determine if queue performance gathering is required by the application. When the following is

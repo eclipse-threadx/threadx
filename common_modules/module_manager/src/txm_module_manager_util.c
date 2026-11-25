@@ -1578,3 +1578,191 @@ ULONG   data_alignment_ignored;
 }
 
 
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_util_math_add_ulong             PORTABLE C      */
+/*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Eclipse ThreadX contributors                                        */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function adds two ULONG values and reports an overflow rather  */
+/*    than wrapping. Unlike TXM_MODULE_MANAGER_UTIL_MATH_ADD_ULONG, it    */
+/*    returns a status, so a caller holding a lock can release it before  */
+/*    returning the error.                                                */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    augend                            First value                       */
+/*    addend                            Second value                      */
+/*    result                            Destination for the sum           */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_SUCCESS                        Sum stored in result              */
+/*    TXM_MODULE_MATH_OVERFLOW          Sum does not fit, result unchanged*/
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Module Manager load functions                                       */
+/*                                                                        */
+/**************************************************************************/
+UINT    _txm_module_manager_util_math_add_ulong(ULONG augend, ULONG addend, ULONG *result)
+{
+
+UINT    status;
+
+
+    /* Refuse a sum that would wrap.  */
+    if ((((ULONG) ~((ULONG) 0)) - augend) < addend)
+    {
+        status =  TXM_MODULE_MATH_OVERFLOW;
+    }
+    else
+    {
+        *result =  augend + addend;
+        status =  TX_SUCCESS;
+    }
+
+    return(status);
+}
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_util_code_address_check         PORTABLE C      */
+/*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Eclipse ThreadX contributors                                        */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function determines whether an address lies inside a module's */
+/*    instruction area. The test is a subtraction on unsigned values, so  */
+/*    it cannot be defeated by an address or size that wraps.             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    code_start                        Start of the instruction area     */
+/*    code_size                         Size of the instruction area      */
+/*    address                           Address to check                  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_TRUE                           Address is inside the area        */
+/*    TX_FALSE                          Anything else                     */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Module Manager load functions                                       */
+/*                                                                        */
+/**************************************************************************/
+UINT    _txm_module_manager_util_code_address_check(ALIGN_TYPE code_start, ULONG code_size, ALIGN_TYPE address)
+{
+
+UINT    inside;
+
+
+    /* The address must not precede the area, and its offset into the area must be less than the
+       area's size.  */
+    if ((address >= code_start) && ((address - code_start) < ((ALIGN_TYPE) code_size)))
+    {
+        inside =  TX_TRUE;
+    }
+    else
+    {
+        inside =  TX_FALSE;
+    }
+
+    return(inside);
+}
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_util_image_size_check           PORTABLE C      */
+/*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Eclipse ThreadX contributors                                        */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks a module image against the length the caller  */
+/*    supplied, before anything else in the image is read: the image     */
+/*    must hold a complete preamble, and the instruction area the        */
+/*    preamble declares must not extend past the image.                  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    module_location                   Module image                      */
+/*    module_size                       Length of the module image        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_SUCCESS                        Image may be loaded               */
+/*    TX_PTR_ERROR                      Null module image                 */
+/*    TXM_MODULE_INVALID                Image too short for its preamble  */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Module Manager length-checked load functions                        */
+/*                                                                        */
+/**************************************************************************/
+UINT    _txm_module_manager_util_image_size_check(VOID *module_location, ULONG module_size)
+{
+
+TXM_MODULE_PREAMBLE     *module_preamble;
+UINT                    status;
+
+
+    if (module_location == TX_NULL)
+    {
+        status =  TX_PTR_ERROR;
+    }
+    else if (module_size < ((ULONG) sizeof(TXM_MODULE_PREAMBLE)))
+    {
+
+        /* The preamble itself would be read past the image.  */
+        status =  TXM_MODULE_INVALID;
+    }
+    else
+    {
+
+        /* The preamble is inside the image, so its code size may be read.  */
+        module_preamble =  (TXM_MODULE_PREAMBLE *) module_location;
+        if (module_preamble -> txm_module_preamble_code_size > module_size)
+        {
+            status =  TXM_MODULE_INVALID;
+        }
+        else
+        {
+            status =  TX_SUCCESS;
+        }
+    }
+
+    return(status);
+}

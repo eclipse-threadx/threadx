@@ -42,10 +42,13 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_interrupt_control_test.c
     ${SOURCE_DIR}/threadx_mutex_basic_test.c
     ${SOURCE_DIR}/threadx_mutex_delete_test.c
+    ${SOURCE_DIR}/threadx_mutex_inherit_wait_exit_test.c
     ${SOURCE_DIR}/threadx_mutex_information_test.c
     ${SOURCE_DIR}/threadx_mutex_nested_priority_inheritance_test.c
     ${SOURCE_DIR}/threadx_mutex_no_preemption_test.c
     ${SOURCE_DIR}/threadx_mutex_preemption_test.c
+    ${SOURCE_DIR}/threadx_mutex_inherit_chain_test.c
+    ${SOURCE_DIR}/threadx_mutex_inherit_waiter_priority_change_test.c
     ${SOURCE_DIR}/threadx_mutex_priority_inheritance_test.c
     ${SOURCE_DIR}/threadx_mutex_proritize_test.c
     ${SOURCE_DIR}/threadx_mutex_suspension_timeout_test.c
@@ -113,8 +116,11 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_timer_simple_test.c
     ${SOURCE_DIR}/threadx_trace_basic_test.c
     ${SOURCE_DIR}/threadx_trace_entry_update_test.c
-    ${SOURCE_DIR}/threadx_initialize_kernel_setup_test.c
-    ${SOURCE_DIR}/threadx_pointer_callback_test.c)
+    ${SOURCE_DIR}/threadx_initialize_kernel_setup_test.c)
+
+if(TX_ENABLE_POINTER_CONTEXT)
+  list(APPEND regression_test_cases ${SOURCE_DIR}/threadx_pointer_callback_test.c)
+endif()
 
 add_custom_command(
   OUTPUT ${GENERATED_LOW_LEVEL_SOURCE}

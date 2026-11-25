@@ -286,12 +286,10 @@ typedef unsigned short                          USHORT;
    build therefore keeps the portable loop on purpose.  (On this core it is moot:
    the R52 toolchain file builds -marm.)
 
-   Two deliberate deviations, per AGENTS.md:
+   Two deliberate MISRA C:2023 deviations:
 
-     - Rule 1.2, language extensions.  Inline assembly is the entire point of the
-       macro; there is no conforming way to reach CLZ.  Spelled __asm__ and not
-       asm, because the asm keyword is rejected under -std=c99 -- verified, it is
-       an "'asm' undeclared" error -- and AGENTS.md requires C99 compatibility.
+     - Rule 1.2 and Directive 4.3. Inline assembly accesses the CLZ instruction.
+       The __asm__ spelling supports GCC builds in strict C99 mode.
 
      - Rule 10.1 / 10.3 on the isolation step, which is why it is respelled.
        Upstream isolates the lowest set bit with (ULONG) (-((LONG) m)): that
@@ -383,7 +381,7 @@ unsigned int   _tx_thread_interrupt_restore(UINT old_posture);
 
 #ifdef TX_THREAD_INIT
 CHAR                            _tx_version_id[] =
-                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadXCortex-R52/GNU Version 6.5.2.202603 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors.  *  ThreadXCortex-R52/GNU Version 6.5.2.202603b *";
 #else
 extern  CHAR                    _tx_version_id[];
 #endif

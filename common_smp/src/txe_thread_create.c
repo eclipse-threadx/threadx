@@ -80,6 +80,7 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
+#ifdef TX_ENABLE_POINTER_CONTEXT
 static UINT    _txe_thread_create_initial(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
                 VOID (*entry_function)(ULONG id), ULONG entry_input,
                 VOID (*entry_function_ptr)(VOID *id), VOID *entry_input_ptr,
@@ -94,6 +95,13 @@ static UINT    _txe_thread_create_initial(TX_THREAD *thread_ptr, TX_NAME_CONST C
                 VOID *stack_start, ULONG stack_size,
                 UINT priority, UINT preempt_threshold,
                 ULONG time_slice, UINT auto_start, UINT thread_control_block_size)
+#else
+UINT    _txe_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
+                VOID (*entry_function)(ULONG id), ULONG entry_input,
+                VOID *stack_start, ULONG stack_size,
+                UINT priority, UINT preempt_threshold,
+                ULONG time_slice, UINT auto_start, UINT thread_control_block_size)
+#endif
 {
 
 TX_INTERRUPT_SAVE_AREA
@@ -229,7 +237,11 @@ TX_THREAD       *current_thread;
         }
 
         /* Check for invalid thread entry point.  */
+#ifdef TX_ENABLE_POINTER_CONTEXT
         else if ((entry_function == TX_NULL) && (entry_function_ptr == TX_NULL))
+#else
+        else if (entry_function == TX_NULL)
+#endif
         {
 
             /* Invalid stack or entry point, return appropriate error code.  */
@@ -304,6 +316,7 @@ TX_THREAD       *current_thread;
     {
 
         /* Call actual thread create function.  */
+#ifdef TX_ENABLE_POINTER_CONTEXT
         if (entry_function_ptr != TX_NULL)
         {
             status =  _tx_thread_create_ptr(thread_ptr, name_ptr,
@@ -312,6 +325,7 @@ TX_THREAD       *current_thread;
                             time_slice, auto_start);
         }
         else
+#endif
         {
             status =  _tx_thread_create(thread_ptr, name_ptr,
                             entry_function, entry_input,
@@ -323,6 +337,8 @@ TX_THREAD       *current_thread;
     /* Return completion status.  */
     return(status);
 }
+
+#ifdef TX_ENABLE_POINTER_CONTEXT
 
 
 /**************************************************************************/
@@ -435,4 +451,4 @@ UINT    _txe_thread_create_ptr(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_p
                                       time_slice, auto_start,
                                       thread_control_block_size));
 }
-
+#endif /* TX_ENABLE_POINTER_CONTEXT */

@@ -92,7 +92,7 @@ extern   "C" {
 #define THREADX_MINOR_VERSION           5
 #define THREADX_PATCH_VERSION           2
 #define THREADX_BUILD_VERSION           202603
-#define THREADX_HOTFIX_VERSION          ' '
+#define THREADX_HOTFIX_VERSION          'b'
 
 /* Define the following symbol for backward compatibility */
 #define EL_PRODUCT_THREADX
@@ -346,8 +346,6 @@ typedef struct TX_TIMER_INTERNAL_STRUCT
     /* Define the timeout function and timeout function parameter.  */
     VOID                (*tx_timer_internal_timeout_function)(ULONG id);
     ULONG               tx_timer_internal_timeout_param;
-    VOID                (*tx_timer_internal_timeout_function_ptr)(VOID *id);
-    VOID                *tx_timer_internal_timeout_param_ptr;
 
 
     /* Define the next and previous internal link pointers for active
@@ -415,6 +413,12 @@ typedef struct TX_TIMER_STRUCT
     ULONG               tx_timer_performance__expiration_adjust_count;
 #endif
 
+#ifdef TX_ENABLE_POINTER_CONTEXT
+    /* Pointer callback storage follows the port and user fields. */
+    VOID                (*tx_timer_timeout_function_ptr)(VOID *input);
+    VOID                *tx_timer_timeout_param_ptr;
+#endif
+
 } TX_TIMER;
 
 
@@ -469,8 +473,6 @@ typedef struct TX_THREAD_STRUCT
     /* Define the thread's entry point and input parameter.  */
     VOID                (*tx_thread_entry)(ULONG id);
     ULONG               tx_thread_entry_parameter;
-    VOID                (*tx_thread_entry_ptr)(VOID *id);
-    VOID                *tx_thread_entry_parameter_ptr;
 
     /* Define the thread's timer block.   This is used for thread
        sleep and timeout requests.  */
@@ -599,6 +601,12 @@ typedef struct TX_THREAD_STRUCT
        additional fields in the thread control block.  This is
        defined in the file tx_port.h.  */
     TX_THREAD_USER_EXTENSION
+
+#ifdef TX_ENABLE_POINTER_CONTEXT
+    /* Pointer callback storage follows the port and user fields. */
+    VOID                (*tx_thread_entry_ptr)(VOID *input);
+    VOID                *tx_thread_entry_parameter_ptr;
+#endif
 
 } TX_THREAD;
 
@@ -1144,12 +1152,10 @@ UINT    _tx_trace_interrupt_control(UINT new_posture);
 #define tx_semaphore_put                            _tx_semaphore_put
 #define tx_semaphore_put_notify                     _tx_semaphore_put_notify
 
+#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_MODULE)
 #define tx_thread_create_ptr                        _tx_thread_create_ptr
-#ifdef TX_ENABLE_POINTER_CALLBACKS
-#define tx_thread_create                            _tx_thread_create_ptr
-#else
-#define tx_thread_create                            _tx_thread_create
 #endif
+#define tx_thread_create                            _tx_thread_create
 #define tx_thread_delete                            _tx_thread_delete
 #define tx_thread_entry_exit_notify                 _tx_thread_entry_exit_notify
 #define tx_thread_identify                          _tx_thread_identify
@@ -1172,12 +1178,10 @@ UINT    _tx_trace_interrupt_control(UINT new_posture);
 #define tx_time_set                                 _tx_time_set
 #define tx_timer_activate                           _tx_timer_activate
 #define tx_timer_change                             _tx_timer_change
+#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_MODULE)
 #define tx_timer_create_ptr                         _tx_timer_create_ptr
-#ifdef TX_ENABLE_POINTER_CALLBACKS
-#define tx_timer_create                             _tx_timer_create_ptr
-#else
-#define tx_timer_create                             _tx_timer_create
 #endif
+#define tx_timer_create                             _tx_timer_create
 #define tx_timer_deactivate                         _tx_timer_deactivate
 #define tx_timer_delete                             _tx_timer_delete
 #define tx_timer_info_get                           _tx_timer_info_get
@@ -1277,12 +1281,10 @@ UINT    _tx_trace_interrupt_control(UINT new_posture);
 #define tx_semaphore_put                            _txr_semaphore_put
 #define tx_semaphore_put_notify                     _txr_semaphore_put_notify
 
+#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_MODULE)
 #define tx_thread_create_ptr(t,n,e,i,s,l,p,r,c,a)   _txe_thread_create_ptr((t),(n),(e),(i),(s),(l),(p),(r),(c),(a),(sizeof(TX_THREAD)))
-#ifdef TX_ENABLE_POINTER_CALLBACKS
-#define tx_thread_create(t,n,e,i,s,l,p,r,c,a)       _txe_thread_create_ptr((t),(n),(e),(i),(s),(l),(p),(r),(c),(a),(sizeof(TX_THREAD)))
-#else
-#define tx_thread_create(t,n,e,i,s,l,p,r,c,a)       _txr_thread_create((t),(n),(e),(i),(s),(l),(p),(r),(c),(a),(sizeof(TX_THREAD)))
 #endif
+#define tx_thread_create(t,n,e,i,s,l,p,r,c,a)       _txr_thread_create((t),(n),(e),(i),(s),(l),(p),(r),(c),(a),(sizeof(TX_THREAD)))
 #define tx_thread_delete                            _txr_thread_delete
 #define tx_thread_entry_exit_notify                 _txr_thread_entry_exit_notify
 #define tx_thread_identify                          _tx_thread_identify
@@ -1305,12 +1307,10 @@ UINT    _tx_trace_interrupt_control(UINT new_posture);
 #define tx_time_set                                 _tx_time_set
 #define tx_timer_activate                           _txr_timer_activate
 #define tx_timer_change                             _txr_timer_change
+#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_MODULE)
 #define tx_timer_create_ptr(t,n,e,i,c,r,a)          _txe_timer_create_ptr((t),(n),(e),(i),(c),(r),(a),(sizeof(TX_TIMER)))
-#ifdef TX_ENABLE_POINTER_CALLBACKS
-#define tx_timer_create(t,n,e,i,c,r,a)              _txe_timer_create_ptr((t),(n),(e),(i),(c),(r),(a),(sizeof(TX_TIMER)))
-#else
-#define tx_timer_create(t,n,e,i,c,r,a)              _txr_timer_create((t),(n),(e),(i),(c),(r),(a),(sizeof(TX_TIMER)))
 #endif
+#define tx_timer_create(t,n,e,i,c,r,a)              _txr_timer_create((t),(n),(e),(i),(c),(r),(a),(sizeof(TX_TIMER)))
 #define tx_timer_deactivate                         _txr_timer_deactivate
 #define tx_timer_delete                             _txr_timer_delete
 #define tx_timer_info_get                           _txr_timer_info_get
@@ -1398,12 +1398,10 @@ UINT    _tx_el_interrupt_control(UINT new_posture);
 #define tx_semaphore_put                            _txe_semaphore_put
 #define tx_semaphore_put_notify                     _txe_semaphore_put_notify
 
+#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_MODULE)
 #define tx_thread_create_ptr(t,n,e,i,s,l,p,r,c,a)   _txe_thread_create_ptr((t),(n),(e),(i),(s),(l),(p),(r),(c),(a),(sizeof(TX_THREAD)))
-#ifdef TX_ENABLE_POINTER_CALLBACKS
-#define tx_thread_create(t,n,e,i,s,l,p,r,c,a)       _txe_thread_create_ptr((t),(n),(e),(i),(s),(l),(p),(r),(c),(a),(sizeof(TX_THREAD)))
-#else
-#define tx_thread_create(t,n,e,i,s,l,p,r,c,a)       _txe_thread_create((t),(n),(e),(i),(s),(l),(p),(r),(c),(a),(sizeof(TX_THREAD)))
 #endif
+#define tx_thread_create(t,n,e,i,s,l,p,r,c,a)       _txe_thread_create((t),(n),(e),(i),(s),(l),(p),(r),(c),(a),(sizeof(TX_THREAD)))
 #define tx_thread_delete                            _txe_thread_delete
 #define tx_thread_entry_exit_notify                 _txe_thread_entry_exit_notify
 #define tx_thread_identify                          _tx_thread_identify
@@ -1426,12 +1424,10 @@ UINT    _tx_el_interrupt_control(UINT new_posture);
 #define tx_time_set                                 _tx_time_set
 #define tx_timer_activate                           _txe_timer_activate
 #define tx_timer_change                             _txe_timer_change
+#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_MODULE)
 #define tx_timer_create_ptr(t,n,e,i,c,r,a)          _txe_timer_create_ptr((t),(n),(e),(i),(c),(r),(a),(sizeof(TX_TIMER)))
-#ifdef TX_ENABLE_POINTER_CALLBACKS
-#define tx_timer_create(t,n,e,i,c,r,a)              _txe_timer_create_ptr((t),(n),(e),(i),(c),(r),(a),(sizeof(TX_TIMER)))
-#else
-#define tx_timer_create(t,n,e,i,c,r,a)              _txe_timer_create((t),(n),(e),(i),(c),(r),(a),(sizeof(TX_TIMER)))
 #endif
+#define tx_timer_create(t,n,e,i,c,r,a)              _txe_timer_create((t),(n),(e),(i),(c),(r),(a),(sizeof(TX_TIMER)))
 #define tx_timer_deactivate                         _txe_timer_deactivate
 #define tx_timer_delete                             _txe_timer_delete
 #define tx_timer_info_get                           _txe_timer_info_get
@@ -1738,11 +1734,13 @@ UINT        _tx_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_pt
                 VOID *stack_start, ULONG stack_size,
                 UINT priority, UINT preempt_threshold,
                 ULONG time_slice, UINT auto_start);
+#ifdef TX_ENABLE_POINTER_CONTEXT
 UINT        _tx_thread_create_ptr(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
                 VOID (*entry_function)(VOID *entry_input), VOID *entry_input,
                 VOID *stack_start, ULONG stack_size,
                 UINT priority, UINT preempt_threshold,
                 ULONG time_slice, UINT auto_start);
+#endif
 UINT        _tx_thread_delete(TX_THREAD *thread_ptr);
 UINT        _tx_thread_entry_exit_notify(TX_THREAD *thread_ptr, VOID (*thread_entry_exit_notify)(TX_THREAD *notify_thread_ptr, UINT type));
 TX_THREAD  *_tx_thread_identify(VOID);
@@ -1780,11 +1778,13 @@ UINT        _txe_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_p
                 VOID *stack_start, ULONG stack_size,
                 UINT priority, UINT preempt_threshold,
                 ULONG time_slice, UINT auto_start, UINT thread_control_block_size);
+#ifdef TX_ENABLE_POINTER_CONTEXT
 UINT        _txe_thread_create_ptr(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
                 VOID (*entry_function)(VOID *entry_input), VOID *entry_input,
                 VOID *stack_start, ULONG stack_size,
                 UINT priority, UINT preempt_threshold,
                 ULONG time_slice, UINT auto_start, UINT thread_control_block_size);
+#endif
 UINT        _txe_thread_delete(TX_THREAD *thread_ptr);
 UINT        _txe_thread_entry_exit_notify(TX_THREAD *thread_ptr, VOID (*thread_entry_exit_notify)(TX_THREAD *notify_thread_ptr, UINT type));
 UINT        _txe_thread_info_get(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR **name, UINT *state, ULONG *run_count,
@@ -1832,9 +1832,11 @@ UINT        _tx_timer_change(TX_TIMER *timer_ptr, ULONG initial_ticks, ULONG res
 UINT        _tx_timer_create(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
                 VOID (*expiration_function)(ULONG input), ULONG expiration_input,
                 ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate);
+#ifdef TX_ENABLE_POINTER_CONTEXT
 UINT        _tx_timer_create_ptr(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
                 VOID (*expiration_function)(VOID *input), VOID *expiration_input,
                 ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate);
+#endif
 UINT        _tx_timer_deactivate(TX_TIMER *timer_ptr);
 UINT        _tx_timer_delete(TX_TIMER *timer_ptr);
 UINT        _tx_timer_info_get(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR **name, UINT *active, ULONG *remaining_ticks,
@@ -1856,9 +1858,11 @@ UINT        _txe_timer_change(TX_TIMER *timer_ptr, ULONG initial_ticks, ULONG re
 UINT        _txe_timer_create(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
                 VOID (*expiration_function)(ULONG input), ULONG expiration_input,
                 ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate, UINT timer_control_block_size);
+#ifdef TX_ENABLE_POINTER_CONTEXT
 UINT        _txe_timer_create_ptr(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
                 VOID (*expiration_function)(VOID *input), VOID *expiration_input,
                 ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate, UINT timer_control_block_size);
+#endif
 UINT        _txe_timer_deactivate(TX_TIMER *timer_ptr);
 UINT        _txe_timer_delete(TX_TIMER *timer_ptr);
 UINT        _txe_timer_info_get(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR **name, UINT *active, ULONG *remaining_ticks,

@@ -13,6 +13,11 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
 # Set build configurations
+option(TX_ENABLE_POINTER_CONTEXT "Exercise the pointer context APIs" OFF)
+if(TX_ENABLE_POINTER_CONTEXT)
+  add_compile_definitions(TX_ENABLE_POINTER_CONTEXT)
+endif()
+
 set(BUILD_CONFIGURATIONS default_build_coverage disable_notify_callbacks_build
                          stack_checking_build stack_checking_rand_fill_build
                          trace_build)
@@ -31,7 +36,7 @@ endif()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Using toolchain file: ${CMAKE_TOOLCHAIN_FILE}.")
-set(default_build_coverage TX_QUEUE_MESSAGE_MAX_SIZE=32)
+set(default_build_coverage TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_MUTEX_INHERIT_CHAIN_MAX=2)
 set(disable_notify_callbacks_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_DISABLE_NOTIFY_CALLBACKS)
 set(stack_checking_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_ENABLE_STACK_CHECKING)
 set(stack_checking_rand_fill_build TX_QUEUE_MESSAGE_MAX_SIZE=32 TX_ENABLE_STACK_CHECKING TX_ENABLE_RANDOM_NUMBER_STACK_FILLING)
@@ -106,4 +111,9 @@ else()
             -Wlogical-op
             -Waggregate-return
             -Wfloat-equal)
+endif()
+
+# Port-level tests for the Windows simulator.
+if(THREADX_ARCH STREQUAL "win64")
+  add_subdirectory(windows_port)
 endif()

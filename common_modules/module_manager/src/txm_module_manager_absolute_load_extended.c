@@ -56,6 +56,11 @@
 /*    that address from the caller, which allows the module instance's    */
 /*    data area to be described correctly.                                */
 /*                                                                        */
+/*    Deprecated: this function cannot check that the instruction area    */
+/*    the preamble declares lies within the module image, because it is   */
+/*    not given the image's length. Use                                   */
+/*    _txm_module_manager_absolute_load_ext instead.                      */
+/*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
 /*    module_instance                   Module instance pointer           */
@@ -76,11 +81,17 @@
 /*    _tx_byte_allocate                 Allocate data area                */
 /*    _tx_mutex_get                     Get protection mutex              */
 /*    _tx_mutex_put                     Release protection mutex          */
+/*    _txm_module_manager_util_code_address_check                         */
+/*                                      Check an entry address            */
+/*    _txm_module_manager_util_math_add_ulong                             */
+/*                                      Add sizes without overflow        */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application code                                                    */
 /*    _txm_module_manager_absolute_load Deprecated wrapper                */
+/*    _txm_module_manager_absolute_load_ext                               */
+/*                                      Length-checked load               */
 /*                                                                        */
 /**************************************************************************/
 UINT  _txm_module_manager_absolute_load_extended(TXM_MODULE_INSTANCE *module_instance, CHAR *module_name, VOID *module_location, VOID *module_data_location)
@@ -105,6 +116,7 @@ ULONG                   data_alignment;
 ULONG                   data_allocation_size;
 ULONG                   module_properties;
 CHAR                    *memory_ptr;
+ALIGN_TYPE              code_start;
 
 
     /* Check for interrupt call.  */
@@ -185,9 +197,15 @@ CHAR                    *memory_ptr;
         return(TXM_MODULE_INVALID_PROPERTIES);
     }
 
-    /* Check for valid module entry offsets.  */
-    if ((module_preamble -> txm_module_preamble_shell_entry_function == 0) ||
-        (module_preamble -> txm_module_preamble_start_function == 0))
+    /* Check for valid module entry addresses. They are absolute, so each must lie inside the
+       module's instruction area; the callback thread is always created, so its entry is required.  */
+    code_start =  (ALIGN_TYPE) module_location;
+    code_size =   module_preamble -> txm_module_preamble_code_size;
+    if ((_txm_module_manager_util_code_address_check(code_start, code_size, (ALIGN_TYPE) module_preamble -> txm_module_preamble_shell_entry_function) == TX_FALSE) ||
+        (_txm_module_manager_util_code_address_check(code_start, code_size, (ALIGN_TYPE) module_preamble -> txm_module_preamble_start_function) == TX_FALSE) ||
+        (_txm_module_manager_util_code_address_check(code_start, code_size, (ALIGN_TYPE) module_preamble -> txm_module_preamble_callback_function) == TX_FALSE) ||
+        ((module_preamble -> txm_module_preamble_stop_function != 0) &&
+         (_txm_module_manager_util_code_address_check(code_start, code_size, (ALIGN_TYPE) module_preamble -> txm_module_preamble_stop_function) == TX_FALSE)))
     {
 
         /* Release the protection mutex.  */
@@ -197,9 +215,10 @@ CHAR                    *memory_ptr;
         return(TXM_MODULE_INVALID);
     }
 
-    /* Check for valid sizes.  */
-    if ((module_preamble -> txm_module_preamble_code_size == 0) ||
-     /* (module_preamble -> txm_module_preamble_data_size == 0) || *** a zero data size is valid */
+    /* Check for valid sizes. A zero data size is valid. The instruction area holds the preamble,
+       so it must be at least as large as the preamble and as the preamble size it declares.  */
+    if ((code_size < ((ULONG) sizeof(TXM_MODULE_PREAMBLE))) ||
+        (module_preamble -> txm_module_preamble_preamble_size > (code_size / ((ULONG) sizeof(ULONG)))) ||
         (module_preamble -> txm_module_preamble_start_stop_stack_size == 0) ||
         (module_preamble -> txm_module_preamble_callback_stack_size == 0))
     {
@@ -218,6 +237,9 @@ CHAR                    *memory_ptr;
     if (status != TX_SUCCESS)
     {
 
+        /* Release the protection mutex.  */
+        _tx_mutex_put(&_txm_module_manager_mutex);
+
         /* Math overflow error occurred.  */
         return(status);
     }
@@ -229,29 +251,41 @@ CHAR                    *memory_ptr;
     TX_MEMSET(module_instance, 0, sizeof(TXM_MODULE_INSTANCE));
 
     /* Pickup the basic module sizes.  */
-    code_size =              module_preamble -> txm_module_preamble_code_size;
     data_size =              module_preamble -> txm_module_preamble_data_size;
     start_stop_stack_size =  module_preamble -> txm_module_preamble_start_stop_stack_size;
     callback_stack_size =    module_preamble -> txm_module_preamble_callback_stack_size;
 
-    TXM_MODULE_MANAGER_UTIL_MATH_ADD_ULONG(data_size, TXM_MODULE_DATA_ALIGNMENT, data_size);
-    data_size =              ((data_size - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
-
     /* Adjust the size of the module elements to be aligned to the default alignment. We do this
        so that when we partition the allocated memory, we can simply place these regions right beside
        each other without having to align their pointers. Note this only works when they all have
-       the same alignment.  */
+       the same alignment. A size that overflows is refused, with the protection mutex released.  */
+    status =  _txm_module_manager_util_math_add_ulong(data_size, (ULONG) TXM_MODULE_DATA_ALIGNMENT, &data_size);
+    if (status == TX_SUCCESS)
+    {
+        data_size =  ((data_size - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
+        status =  _txm_module_manager_util_math_add_ulong(start_stop_stack_size, (ULONG) TXM_MODULE_DATA_ALIGNMENT, &start_stop_stack_size);
+    }
+    if (status == TX_SUCCESS)
+    {
+        start_stop_stack_size =  ((start_stop_stack_size - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
+        status =  _txm_module_manager_util_math_add_ulong(callback_stack_size, (ULONG) TXM_MODULE_DATA_ALIGNMENT, &callback_stack_size);
+    }
+    if (status == TX_SUCCESS)
+    {
+        callback_stack_size =  ((callback_stack_size - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
 
-    TXM_MODULE_MANAGER_UTIL_MATH_ADD_ULONG(start_stop_stack_size, TXM_MODULE_DATA_ALIGNMENT, start_stop_stack_size);
-    start_stop_stack_size =  ((start_stop_stack_size - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
+        /* Update the data size to account for the default thread stacks.  */
+        status =  _txm_module_manager_util_math_add_ulong(start_stop_stack_size, callback_stack_size, &data_allocation_size);
+    }
+    if (status != TX_SUCCESS)
+    {
 
-    TXM_MODULE_MANAGER_UTIL_MATH_ADD_ULONG(callback_stack_size, TXM_MODULE_DATA_ALIGNMENT, callback_stack_size);
-    callback_stack_size =    ((callback_stack_size - 1)/TXM_MODULE_DATA_ALIGNMENT) * TXM_MODULE_DATA_ALIGNMENT;
+        /* Release the protection mutex.  */
+        _tx_mutex_put(&_txm_module_manager_mutex);
 
-    /* Update the data size to account for the default thread stacks.  */
-    data_allocation_size = 0;
-    TXM_MODULE_MANAGER_UTIL_MATH_ADD_ULONG(data_allocation_size, start_stop_stack_size, data_allocation_size);
-    TXM_MODULE_MANAGER_UTIL_MATH_ADD_ULONG(data_allocation_size, callback_stack_size, data_allocation_size);
+        /* Math overflow error occurred.  */
+        return(status);
+    }
 
     /* Setup the default code and data alignments.  */
     data_alignment =  (ULONG) TXM_MODULE_DATA_ALIGNMENT;
@@ -291,7 +325,16 @@ CHAR                    *memory_ptr;
     Highest Address:    */
 
     /* Add an extra alignment increment so we can align the pointer after allocation.  */
-    TXM_MODULE_MANAGER_UTIL_MATH_ADD_ULONG(data_allocation_size, data_alignment, data_allocation_size);
+    status =  _txm_module_manager_util_math_add_ulong(data_allocation_size, data_alignment, &data_allocation_size);
+    if (status != TX_SUCCESS)
+    {
+
+        /* Release the protection mutex.  */
+        _tx_mutex_put(&_txm_module_manager_mutex);
+
+        /* Math overflow error occurred.  */
+        return(status);
+    }
 
     /* Allocate memory for the module.  */
     status =  _tx_byte_allocate(&_txm_module_manager_byte_pool, (VOID **) &memory_ptr, data_allocation_size, TX_NO_WAIT);
@@ -483,4 +526,65 @@ CHAR                    *memory_ptr;
 
     /* Return success.  */
     return(TX_SUCCESS);
+}
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txm_module_manager_absolute_load_ext               PORTABLE C      */
+/*                                                           6.5.2        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Eclipse ThreadX contributors                                        */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function loads an absolutely located module, as                */
+/*    _txm_module_manager_absolute_load_extended does, after checking the */
+/*    module image against its length: the image must hold a complete     */
+/*    preamble, and the instruction area the preamble declares must not   */
+/*    extend past the image. A TX_NULL data location behaves as           */
+/*    _txm_module_manager_absolute_load does.                             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    module_instance                   Module instance pointer           */
+/*    module_name                       Module name pointer               */
+/*    module_location                   Module code location              */
+/*    module_size                       Length of the module image        */
+/*    module_data_location              Module data location, or TX_NULL  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _txm_module_manager_util_image_size_check                           */
+/*                                      Check the image against its length*/
+/*    _txm_module_manager_absolute_load_extended                          */
+/*                                      Load the module                   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application code                                                    */
+/*                                                                        */
+/**************************************************************************/
+UINT  _txm_module_manager_absolute_load_ext(TXM_MODULE_INSTANCE *module_instance, CHAR *module_name, VOID *module_location,
+                                            ULONG module_size, VOID *module_data_location)
+{
+
+UINT    status;
+
+
+    /* Nothing in the image is read until it is known to hold its preamble and its code.  */
+    status =  _txm_module_manager_util_image_size_check(module_location, module_size);
+    if (status == TX_SUCCESS)
+    {
+        status =  _txm_module_manager_absolute_load_extended(module_instance, module_name, module_location, module_data_location);
+    }
+
+    return(status);
 }

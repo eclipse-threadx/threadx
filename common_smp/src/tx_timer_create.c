@@ -69,6 +69,7 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
+#ifdef TX_ENABLE_POINTER_CONTEXT
 static UINT  _tx_timer_create_initial(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
                                       VOID (*expiration_function)(ULONG id), ULONG expiration_input,
                                       VOID (*expiration_function_ptr)(VOID *id), VOID *expiration_input_ptr,
@@ -79,6 +80,11 @@ static UINT  _tx_timer_create_initial(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *n
                                       VOID (*expiration_function)(ULONG id), ULONG expiration_input,
                                       VOID (*expiration_function_ptr)(VOID *id), VOID *expiration_input_ptr,
                                       ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate)
+#else
+UINT  _tx_timer_create(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
+            VOID (*expiration_function)(ULONG id), ULONG expiration_input,
+            ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate)
+#endif
 {
 
 TX_INTERRUPT_SAVE_AREA
@@ -96,8 +102,10 @@ TX_TIMER        *previous_timer;
     timer_ptr -> tx_timer_internal.tx_timer_internal_re_initialize_ticks =  reschedule_ticks;
     timer_ptr -> tx_timer_internal.tx_timer_internal_timeout_function =     expiration_function;
     timer_ptr -> tx_timer_internal.tx_timer_internal_timeout_param =        expiration_input;
-    timer_ptr -> tx_timer_internal.tx_timer_internal_timeout_function_ptr = expiration_function_ptr;
-    timer_ptr -> tx_timer_internal.tx_timer_internal_timeout_param_ptr =    expiration_input_ptr;
+#ifdef TX_ENABLE_POINTER_CONTEXT
+    timer_ptr -> tx_timer_timeout_function_ptr =                         expiration_function_ptr;
+    timer_ptr -> tx_timer_timeout_param_ptr =                            expiration_input_ptr;
+#endif
 
 #ifdef TX_THREAD_SMP_ONLY_CORE_0_DEFAULT
 
@@ -175,6 +183,8 @@ TX_TIMER        *previous_timer;
     /* Return TX_SUCCESS.  */
     return(TX_SUCCESS);
 }
+
+#ifdef TX_ENABLE_POINTER_CONTEXT
 
 
 /**************************************************************************/
@@ -255,4 +265,4 @@ UINT  _tx_timer_create_ptr(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
                                     expiration_function, expiration_input,
                                     initial_ticks, reschedule_ticks, auto_activate));
 }
-
+#endif /* TX_ENABLE_POINTER_CONTEXT */

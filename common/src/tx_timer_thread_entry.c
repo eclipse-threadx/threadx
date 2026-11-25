@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -78,8 +79,11 @@ TX_TIMER_INTERNAL           *previous_timer;
 TX_TIMER_INTERNAL           *current_timer;
 VOID                        (*timeout_function)(ULONG id);
 ULONG                       timeout_param =  ((ULONG) 0);
+#ifdef TX_ENABLE_POINTER_CONTEXT
 VOID                        (*timeout_function_ptr)(VOID *id);
 VOID                        *timeout_param_ptr =  TX_NULL;
+TX_TIMER                    *pointer_timer;
+#endif
 TX_THREAD                   *thread_ptr;
 #ifdef TX_REACTIVATE_INLINE
 TX_TIMER_INTERNAL           **timer_list;               /* Timer list pointer           */
@@ -219,7 +223,9 @@ TX_TIMER                    *timer_ptr;
                     /* Set the timeout function to NULL in order to bypass the
                        expiration.  */
                     timeout_function =      TX_NULL;
+#ifdef TX_ENABLE_POINTER_CONTEXT
                     timeout_function_ptr =  TX_NULL;
+#endif
 
                     /* Make the timer appear that it is still active while interrupts
                        are enabled.  This will permit proper processing of a timer
@@ -262,8 +268,16 @@ TX_TIMER                    *timer_ptr;
                        are re-enabled.  */
                     timeout_function =      current_timer -> tx_timer_internal_timeout_function;
                     timeout_param =         current_timer -> tx_timer_internal_timeout_param;
-                    timeout_function_ptr =  current_timer -> tx_timer_internal_timeout_function_ptr;
-                    timeout_param_ptr =     current_timer -> tx_timer_internal_timeout_param_ptr;
+#ifdef TX_ENABLE_POINTER_CONTEXT
+                    /* Only application timers have pointer callback storage. */
+                    timeout_function_ptr =  TX_NULL;
+                    if (timeout_function != &_tx_thread_timeout)
+                    {
+                        TX_USER_TIMER_POINTER_GET(current_timer, pointer_timer)
+                        timeout_function_ptr =  pointer_timer -> tx_timer_timeout_function_ptr;
+                        timeout_param_ptr =     pointer_timer -> tx_timer_timeout_param_ptr;
+                    }
+#endif
 
                     /* Copy the reinitialize ticks into the remaining ticks.  */
                     current_timer -> tx_timer_internal_remaining_ticks =  current_timer -> tx_timer_internal_re_initialize_ticks;
@@ -298,12 +312,15 @@ TX_TIMER                    *timer_ptr;
                 TX_RESTORE
 
                 /* Call the timer-expiration function, if non-NULL.  */
+#ifdef TX_ENABLE_POINTER_CONTEXT
                 if (timeout_function_ptr != TX_NULL)
                 {
 
                     (timeout_function_ptr) (timeout_param_ptr);
                 }
-                else if (timeout_function != TX_NULL)
+                else
+#endif
+                if (timeout_function != TX_NULL)
                 {
 
                     (timeout_function) (timeout_param);
@@ -324,7 +341,11 @@ TX_TIMER                    *timer_ptr;
 #ifdef TX_TIMER_ENABLE_PERFORMANCE_INFO
 
                     /* Determine if this timer expired.  */
+#ifdef TX_ENABLE_POINTER_CONTEXT
                     if ((timeout_function != TX_NULL) || (timeout_function_ptr != TX_NULL))
+#else
+                    if (timeout_function != TX_NULL)
+#endif
                     {
 
                         /* Increment the total reactivations counter.  */
