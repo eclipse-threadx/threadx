@@ -81,10 +81,12 @@ VOID        _tx_mutex_initialize(VOID);
 
 /* Define internal mutex management function prototypes.  */
 
+VOID        _tx_mutex_priority_chain(TX_THREAD *thread_ptr);
 VOID        _tx_mutex_cleanup(TX_THREAD *thread_ptr, ULONG suspension_sequence);
 VOID        _tx_mutex_thread_release(TX_THREAD *thread_ptr);
 VOID        _tx_mutex_priority_change(TX_THREAD *thread_ptr, UINT new_priority);
 VOID        _tx_mutex_inherit_priority_update(TX_MUTEX *mutex_ptr);
+UINT        _tx_mutex_waiter_priority_change(TX_THREAD *thread_ptr, UINT new_priority);
 
 
 /* Mutex management component data declarations follow.  */
