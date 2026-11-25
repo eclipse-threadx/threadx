@@ -453,18 +453,26 @@ INT     secure_context_index;
             else
             {
 
+                /* Clear the active secure stack registers before releasing that stack.  */
+                if (__get_PSPLIM() == (ULONG) info_ptr -> tx_thread_secure_stack_limit)
+                {
+                    __set_PSPLIM(0U);
+                    __set_PSP(0U);
+                }
+
                 /* Free secure stack. */
                 free(info_ptr -> tx_thread_secure_stack_limit);
 
                 TX_DISABLE
 
                 /* Free info struct. */
+                info_ptr -> tx_thread_ptr = TX_NULL;
                 tx_thread_secure_context[secure_context_index].tx_next_free_index = tx_head_free_index;
                 tx_head_free_index = secure_context_index;
-                TX_RESTORE
 
                 /* Clear secure context from thread. */
                 thread_ptr -> tx_thread_secure_stack_context = 0;
+                TX_RESTORE
             }
         }
     }

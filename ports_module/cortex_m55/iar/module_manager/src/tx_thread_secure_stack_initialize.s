@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -7,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+; Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -69,6 +71,8 @@ _tx_thread_secure_stack_initialize:
 #if !defined(TX_SINGLE_MODE_SECURE) && !defined(TX_SINGLE_MODE_NON_SECURE)
     CPSIE   i               // Enable interrupts for SVC call
     SVC     3
+    EXPORT _tx_secure_init_return
+_tx_secure_init_return:
     CPSID   i               // Disable interrupts
 #else
     MOV     r0, #0xFF       // Feature not enabled

@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026 Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -7,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -72,13 +74,15 @@ ALIGN_TYPE _txm_module_manager_port_dispatch(TXM_MODULE_INSTANCE *module_instanc
 
 ALIGN_TYPE return_value = TX_NOT_AVAILABLE;
 
+    (VOID) param_2;
+
     switch(kernel_request)
     {
         case TXM_THREAD_SECURE_STACK_ALLOCATE_CALL:
         {
             if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
             {
-                if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_THREAD)))
+                if (TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT) == TX_FALSE)
                     return(TXM_MODULE_INVALID_MEMORY);
             }
 
@@ -93,7 +97,7 @@ ALIGN_TYPE return_value = TX_NOT_AVAILABLE;
         {
             if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
             {
-                if (!TXM_MODULE_MANAGER_PARAM_CHECK_OBJECT_FOR_USE(module_instance, param_0, sizeof(TX_THREAD)))
+                if (TXM_MODULE_MANAGER_PARAM_CHECK_TYPED_OBJECT_FOR_USE(module_instance, param_0, TXM_THREAD_OBJECT) == TX_FALSE)
                     return(TXM_MODULE_INVALID_MEMORY);
             }
 

@@ -34,6 +34,10 @@
     EXTERN  _tx_thread_secure_stack_context_save
     EXTERN  _tx_thread_secure_mode_stack_allocate
     EXTERN  _tx_thread_secure_mode_stack_free
+#if (!defined(TX_SINGLE_MODE_SECURE) && !defined(TX_SINGLE_MODE_NON_SECURE))
+    EXTERN  _tx_thread_secure_mode_stack_initialize
+    EXTERN  _tx_secure_init_return
+#endif
     EXTERN  _tx_alloc_return
     EXTERN  _tx_free_return
     SECTION `.text`:CODE:NOROOT(2)
@@ -532,11 +536,14 @@ SVC_Handler:
 #endif  // End of ifndef TX_SINGLE_MODE_SECURE, TX_SINGLE_MODE_NON_SECURE
 
 
-    CMP     r2, #3                                  // Is it the entry into ThreadX?
+    CMP     r2, #3                                  // Kernel entry or secure stack initialization?
     BNE     _tx_thread_user_return                  // No, return to user mode
 
-    /* At this point we have an SVC 3, which means we are entering
-       the kernel from a module thread with user mode selected. */
+#if (!defined(TX_SINGLE_MODE_SECURE) && !defined(TX_SINGLE_MODE_NON_SECURE))
+    LDR     r2, =_tx_secure_init_return-1            // Check for secure stack initialization
+    CMP     r1, r2
+    BEQ     _tx_svc_secure_init
+#endif
 
     LDR     r2, =_txm_module_priv-1                 // Load address of where we should have come from
     CMP     r1, r2                                  // Did we come from user_mode_entry?
@@ -674,6 +681,12 @@ _tx_skip_kernel_stack_exit:
 
 
 #if (!defined(TX_SINGLE_MODE_SECURE) && !defined(TX_SINGLE_MODE_NON_SECURE))
+_tx_svc_secure_init:
+    PUSH    {r0, lr}                                // Save stack alignment and EXC_RETURN
+    BL      _tx_thread_secure_mode_stack_initialize
+    POP     {r0, lr}
+    BX      lr
+
 _tx_svc_secure_alloc:
     LDR     r2, =_tx_alloc_return-1                 // Load address of where we should have come from
     CMP     r1, r2                                  // Did we come from _tx_thread_secure_stack_allocate?

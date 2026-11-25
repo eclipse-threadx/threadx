@@ -410,6 +410,7 @@ TX_INTERRUPT_SAVE_AREA
 UINT    status;
 TX_THREAD_SECURE_STACK_INFO *info_ptr;
 ULONG   ipsr;
+ULONG   psplim;
 INT     secure_context_index;
 
     status = TX_SUCCESS;
@@ -453,18 +454,26 @@ INT     secure_context_index;
             else
             {
 
+                /* Clear the active secure stack registers before releasing that stack.  */
+                __asm__ volatile("MRS     %0, PSPLIM" : "=r" (psplim));
+                if (psplim == (ULONG) info_ptr -> tx_thread_secure_stack_limit)
+                {
+                    __asm__ volatile("MSR     PSPLIM, %0\n\tMSR     PSP, %0" :: "r" (0UL) : "memory");
+                }
+
                 /* Free secure stack. */
                 free(info_ptr -> tx_thread_secure_stack_limit);
 
                 TX_DISABLE
 
                 /* Free info struct. */
+                info_ptr -> tx_thread_ptr = TX_NULL;
                 tx_thread_secure_context[secure_context_index].tx_next_free_index = tx_head_free_index;
                 tx_head_free_index = secure_context_index;
-                TX_RESTORE
 
                 /* Clear secure context from thread. */
                 thread_ptr -> tx_thread_secure_stack_context = 0;
+                TX_RESTORE
             }
         }
     }

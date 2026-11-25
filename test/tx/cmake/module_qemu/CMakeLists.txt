@@ -38,7 +38,8 @@
 #   ctest --test-dir build/module_qemu_m3 --output-on-failure
 #
 # MODULE_QEMU_PORT selects Cortex-M3 (mps2-an385), Cortex-M4 (mps2-an386),
-# or Cortex-M55 in secure-only mode (mps3-an547).
+# or Cortex-M55 (mps3-an547). MODULE_QEMU_M55_DUAL_STATE boots the M55
+# Module Manager in the Non-secure state with ThreadX secure stack services.
 
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
@@ -46,7 +47,9 @@ project(threadx_module_qemu LANGUAGES C ASM)
 
 set(MODULE_QEMU_PORT "cortex_m3" CACHE STRING "Cortex-M module port to build and run")
 set_property(CACHE MODULE_QEMU_PORT PROPERTY STRINGS cortex_m3 cortex_m4 cortex_m55)
+option(MODULE_QEMU_M55_DUAL_STATE "Run the Cortex-M55 Module Manager in the Non-secure state" OFF)
 
+set(MANAGER_CODE_ORIGIN 0x00000000)
 set(MANAGER_CODE_LENGTH 0x00400000)
 set(MANAGER_RAM_LENGTH 0x00100000)
 
@@ -66,6 +69,11 @@ elseif(MODULE_QEMU_PORT STREQUAL "cortex_m55")
     set(CMAKE_C_STANDARD 99)
     set(CMAKE_C_STANDARD_REQUIRED ON)
     set(CMAKE_C_EXTENSIONS OFF)
+    if(MODULE_QEMU_M55_DUAL_STATE)
+        set(M55_GATEWAY_START 0x0000F000)
+        set(MANAGER_CODE_ORIGIN 0x00010000)
+        set(MANAGER_CODE_LENGTH 0x00070000)
+    endif()
 else()
     message(FATAL_ERROR "Unsupported MODULE_QEMU_PORT '${MODULE_QEMU_PORT}'")
 endif()
@@ -107,6 +115,13 @@ file(GLOB TXM_PORT_SRC
      ${PORT_DIR}/module_manager/src/*.s
      ${PORT_DIR}/module_manager/src/*.c)
 file(GLOB TXM_MANAGER_SRC ${REPO_ROOT}/common_modules/module_manager/src/*.c)
+if(MODULE_QEMU_M55_DUAL_STATE)
+    if(NOT MODULE_QEMU_PORT STREQUAL "cortex_m55")
+        message(FATAL_ERROR "MODULE_QEMU_M55_DUAL_STATE requires cortex_m55")
+    endif()
+    set(SECURE_STACK_SOURCE ${PORT_DIR}/module_manager/src/tx_thread_secure_stack.c)
+    list(REMOVE_ITEM TXM_PORT_SRC ${SECURE_STACK_SOURCE})
+endif()
 
 add_library(threadx_module STATIC ${TX_COMMON_SRC} ${TXM_PORT_SRC} ${TXM_MANAGER_SRC})
 target_include_directories(threadx_module PUBLIC
@@ -116,14 +131,28 @@ target_include_directories(threadx_module PUBLIC
     ${REPO_ROOT}/common_modules/module_manager/inc)
 
 if(MODULE_QEMU_PORT STREQUAL "cortex_m55")
-    target_compile_definitions(threadx_module PUBLIC TX_SINGLE_MODE_SECURE)
-
-    # The dual-state secure stack implementation is outside the QEMU run.
-    add_library(m55_secure_stack_compile_check OBJECT
-        ${PORT_DIR}/module_manager/src/tx_thread_secure_stack.c)
-    target_include_directories(m55_secure_stack_compile_check PRIVATE
-        $<TARGET_PROPERTY:threadx_module,INCLUDE_DIRECTORIES>)
-    target_compile_options(m55_secure_stack_compile_check PRIVATE -mcmse)
+    if(MODULE_QEMU_M55_DUAL_STATE)
+        set(SECURE_LINKER_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/m55_secure.ld)
+        set(SECURE_IMPORT ${CMAKE_CURRENT_BINARY_DIR}/m55_secure_import.o)
+        configure_file(${HARNESS_SRC}/m55_secure.ld.in ${SECURE_LINKER_SCRIPT} @ONLY)
+        add_executable(m55_secure.elf ${HARNESS_SRC}/m55_secure_startup.S ${SECURE_STACK_SOURCE})
+        target_include_directories(m55_secure.elf PRIVATE $<TARGET_PROPERTY:threadx_module,INCLUDE_DIRECTORIES>)
+        target_compile_options(m55_secure.elf PRIVATE -mcmse)
+        target_link_options(m55_secure.elf PRIVATE
+            -mcmse -T${SECURE_LINKER_SCRIPT} -nostartfiles --specs=nano.specs --specs=nosys.specs
+            -Wl,--no-warn-rwx-segments
+            -Wl,--section-start=.gnu.sgstubs=${M55_GATEWAY_START}
+            -Wl,--cmse-implib,--out-implib=${SECURE_IMPORT}.tmp)
+        set_target_properties(m55_secure.elf PROPERTIES LINK_DEPENDS ${SECURE_LINKER_SCRIPT})
+        add_custom_command(TARGET m55_secure.elf POST_BUILD
+            BYPRODUCTS ${SECURE_IMPORT}
+            COMMAND ${CMAKE_COMMAND} -E rename ${SECURE_IMPORT}.tmp ${SECURE_IMPORT}
+            VERBATIM)
+        target_link_libraries(threadx_module INTERFACE ${SECURE_IMPORT})
+        set(QEMU_SECURE_IMAGE --secure-elf $<TARGET_FILE:m55_secure.elf>)
+    else()
+        target_compile_definitions(threadx_module PUBLIC TX_SINGLE_MODE_SECURE)
+    endif()
 endif()
 
 # ---------------------------------------------------------------------------
@@ -152,7 +181,7 @@ target_include_directories(txm_module_lib PUBLIC
     ${REPO_ROOT}/common/inc
     ${REPO_ROOT}/common_modules/inc)
 target_compile_options(txm_module_lib PRIVATE -fpic ${MODULE_PIC_FLAGS})
-if(MODULE_QEMU_PORT STREQUAL "cortex_m55")
+if(MODULE_QEMU_PORT STREQUAL "cortex_m55" AND NOT MODULE_QEMU_M55_DUAL_STATE)
     target_compile_definitions(txm_module_lib PUBLIC TX_SINGLE_MODE_SECURE)
 endif()
 
@@ -248,7 +277,7 @@ function(module_qemu_add_test name test_source)
                  COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/run_qemu_test.py
                          --qemu ${QEMU_SYSTEM_ARM}
                          --machine ${QEMU_MACHINE}
-                         --elf $<TARGET_FILE:${name}.elf>)
+                         --elf $<TARGET_FILE:${name}.elf> ${QEMU_SECURE_IMAGE})
     endif()
 endfunction()
 

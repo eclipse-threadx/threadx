@@ -21,7 +21,8 @@ name: module_qemu
 #
 #   - cortex_m3 on mps2-an385 and cortex_m4 on mps2-an386, the latter built
 #     for its FPU with the hard-float ABI;
-#   - cortex_m55 in secure-only mode on mps3-an547 with the hard-float ABI;
+#   - cortex_m55 in secure-only and dual-state modes on mps3-an547 with the
+#     hard-float ABI, exercising secure stack allocation, scheduling and release;
 #   - a protected module loaded, started, exercising the kernel, stopped and
 #     unloaded twice, with its memory given back;
 #   - a protected module faulting on a read of kernel memory, reported to the
@@ -124,29 +125,35 @@ jobs:
         arm-none-eabi-gcc --version | head -1
 
         status=0
-        for port in cortex_m3 cortex_m4 cortex_m55; do
-          build="build/module_qemu_$port"
+        for config in cortex_m3 cortex_m4 cortex_m55 cortex_m55_dual; do
+          build="build/module_qemu_$config"
+          port="$config"
+          dual=OFF
+          if [ "$config" = cortex_m55_dual ]; then
+            port=cortex_m55
+            dual=ON
+          fi
           echo ""
           echo "=============================================================="
-          echo "== $port"
+          echo "== $config"
           echo "=============================================================="
 
           if ! cmake -S test/tx/cmake/module_qemu -B "$build" -G Ninja \
                   -DCMAKE_TOOLCHAIN_FILE="$PWD/test/tx/cmake/module_qemu/arm-none-eabi-qemu.cmake" \
-                  -DMODULE_QEMU_PORT="$port"; then
-            echo "::error::$port: CMake configure failed"
+                  -DMODULE_QEMU_PORT="$port" -DMODULE_QEMU_M55_DUAL_STATE="$dual"; then
+            echo "::error::$config: CMake configure failed"
             status=1
             continue
           fi
           if ! cmake --build "$build"; then
-            echo "::error::$port: the images did not build"
+            echo "::error::$config: the images did not build"
             status=1
             continue
           fi
           # --no-tests=error: the tests are registered only when QEMU and
           # Python are found, and ctest's default would pass on none.
           if ! ctest --test-dir "$build" --output-on-failure --no-tests=error; then
-            echo "::error::$port: one or more images failed on QEMU, or no tests were registered"
+            echo "::error::$config: one or more images failed on QEMU, or no tests were registered"
             status=1
           fi
         done

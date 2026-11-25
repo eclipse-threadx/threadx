@@ -31,6 +31,13 @@
 
 #include "harness_checks.h"
 
+#ifdef MODULE_QEMU_CORTEX_M55
+#include <limits.h>
+#if !defined(TX_SINGLE_MODE_SECURE) && !defined(TX_TIMER_PROCESS_IN_ISR)
+#include "tx_timer.h"
+#endif
+#endif
+
 #define LIFECYCLE_CYCLES        ((ULONG) 2UL)
 #define MODULE_WAIT_TICKS       ((ULONG) 500UL)
 #define PROTECTED_PROPERTIES    ((ULONG) 0x02000007UL)  /* GNU; user mode, memory protection, shared memory */
@@ -40,6 +47,61 @@ extern UCHAR                    module_services_protected[];
 static TXM_MODULE_INSTANCE      test_module;
 
 #ifdef MODULE_QEMU_CORTEX_M55
+static TX_SEMAPHORE             test_semaphore;
+
+#if !defined(TX_SINGLE_MODE_SECURE) && !defined(TX_TIMER_PROCESS_IN_ISR)
+/* Check that kernel startup reserves a separate secure stack for the timer thread.  */
+static VOID  m55_check_startup_secure_stacks(VOID)
+{
+TX_THREAD *thread_ptr;
+TX_THREAD unused_thread = {0};
+
+    thread_ptr = tx_thread_identify();
+    harness_expect("timer thread has a secure stack",
+                   (ULONG) (_tx_timer_thread.tx_thread_secure_stack_context != TX_NULL), (ULONG) TX_TRUE);
+    harness_expect("allocate a secure stack without a thread",
+                   (ULONG) tx_thread_secure_stack_allocate(TX_NULL, 256UL), (ULONG) TX_THREAD_ERROR);
+    harness_expect("allocate a secure stack for an uncreated thread",
+                   (ULONG) tx_thread_secure_stack_allocate(&unused_thread, 256UL), (ULONG) TX_THREAD_ERROR);
+    harness_expect("free a secure stack without a thread",
+                   (ULONG) tx_thread_secure_stack_free(TX_NULL), (ULONG) TX_THREAD_ERROR);
+    harness_expect("free a secure stack for an uncreated thread",
+                   (ULONG) tx_thread_secure_stack_free(&unused_thread), (ULONG) TX_THREAD_ERROR);
+    harness_expect("free before secure stack allocation",
+                   (ULONG) tx_thread_secure_stack_free(thread_ptr), (ULONG) TX_THREAD_ERROR);
+    harness_expect("allocate a secure stack below the minimum",
+                   (ULONG) tx_thread_secure_stack_allocate(thread_ptr, 255UL), (ULONG) TX_SIZE_ERROR);
+    harness_expect("allocate a secure stack above the maximum",
+                   (ULONG) tx_thread_secure_stack_allocate(thread_ptr, 1025UL), (ULONG) TX_SIZE_ERROR);
+    harness_expect("allocate manager thread secure stack",
+                   (ULONG) tx_thread_secure_stack_allocate(thread_ptr, 256UL), (ULONG) TX_SUCCESS);
+    harness_expect("manager thread has a distinct secure stack",
+                   (ULONG) (thread_ptr -> tx_thread_secure_stack_context != _tx_timer_thread.tx_thread_secure_stack_context),
+                   (ULONG) TX_TRUE);
+    harness_expect("allocate the manager thread secure stack again",
+                   (ULONG) tx_thread_secure_stack_allocate(thread_ptr, 256UL), (ULONG) TX_THREAD_ERROR);
+}
+#endif
+
+/* Check that secure stack dispatch accepts only thread handles and known requests.  */
+static VOID  m55_check_dispatch(VOID)
+{
+
+    harness_expect("secure stack allocation without a thread",
+                   (ULONG) _txm_module_manager_port_dispatch(&test_module, TXM_THREAD_SECURE_STACK_ALLOCATE_CALL,
+                       0UL, 0UL, 0UL), (ULONG) TXM_MODULE_INVALID_MEMORY);
+    harness_expect("secure stack free without a thread",
+                   (ULONG) _txm_module_manager_port_dispatch(&test_module, TXM_THREAD_SECURE_STACK_FREE_CALL,
+                       0UL, 0UL, 0UL), (ULONG) TXM_MODULE_INVALID_MEMORY);
+    harness_expect("secure stack request with a semaphore handle",
+                   (ULONG) _txm_module_manager_port_dispatch(&test_module, TXM_THREAD_SECURE_STACK_ALLOCATE_CALL,
+                       (ALIGN_TYPE) &test_semaphore, 0UL, 0UL), (ULONG) TXM_MODULE_INVALID_MEMORY);
+    harness_expect("unknown port request",
+                   (ULONG) _txm_module_manager_port_dispatch(&test_module, TXM_MODULE_PORT_EXTENSION_API_ID_START + 2UL,
+                       0UL, 0UL, 0UL), (ULONG) TX_NOT_AVAILABLE);
+}
+
+
 /* Check MPU limit attributes and the number of grants a loaded module can hold.  */
 static VOID  m55_check_loaded_grants(VOID)
 {
@@ -55,6 +117,14 @@ ULONG   limit;
     limit = test_module.txm_module_instance_mpu_registers[TXM_MODULE_MPU_SHARED_INDEX].txm_module_mpu_region_limit_address;
     harness_expect("shared region limit attributes", limit & (TXM_MODULE_MPU_ALIGNMENT - 1UL),
                    TXM_MODULE_ATTRIBUTE_INDEX | TXM_MODULE_ATTRIBUTE_REGION_ENABLE);
+    address = MODULE_SHARED_BASE + MODULE_SHARED_SIZE - sizeof(ULONG);
+    harness_expect("object ends at the shared region boundary",
+                   (ULONG) _txm_module_manager_inside_data_check(&test_module, address, sizeof(ULONG)), (ULONG) TX_TRUE);
+    harness_expect("object crosses the shared region boundary",
+                   (ULONG) _txm_module_manager_inside_data_check(&test_module, address, sizeof(ULONG) + 1U), (ULONG) TX_FALSE);
+    harness_expect("unrepresentable shared range",
+                   (ULONG) _txm_module_manager_inside_data_check(&test_module, (ALIGN_TYPE) MODULE_SHARED_BASE, UINT_MAX),
+                   (ULONG) TX_FALSE);
 
     for (slot = 1UL; slot < TXM_MODULE_MPU_SHARED_ENTRIES; slot++)
     {
@@ -79,8 +149,13 @@ ULONG   available_before;
     harness_print("Module lifecycle: protected module, load/start/stop/unload twice\n");
 
 #ifdef MODULE_QEMU_CORTEX_M55
+#if !defined(TX_SINGLE_MODE_SECURE) && !defined(TX_TIMER_PROCESS_IN_ISR)
+    m55_check_startup_secure_stacks();
+#endif
     harness_expect("grant without a module", (ULONG) harness_shared_grant(TX_NULL), (ULONG) TX_PTR_ERROR);
     harness_expect("grant to unloaded module", (ULONG) harness_shared_grant(&test_module), (ULONG) TX_PTR_ERROR);
+    harness_expect("create semaphore for handle check",
+                   (ULONG) tx_semaphore_create(&test_semaphore, "handle type check", 0UL), (ULONG) TX_SUCCESS);
 #endif
 
     available_before = harness_module_pool_available();
@@ -99,6 +174,7 @@ ULONG   available_before;
         harness_expect("shared area grant", (ULONG) harness_shared_grant(&test_module), (ULONG) TX_SUCCESS);
 #ifdef MODULE_QEMU_CORTEX_M55
         m55_check_loaded_grants();
+        m55_check_dispatch();
 #endif
         harness_expect("module start", (ULONG) txm_module_manager_start(&test_module), (ULONG) TX_SUCCESS);
 #ifdef MODULE_QEMU_CORTEX_M55
@@ -115,4 +191,13 @@ ULONG   available_before;
         harness_expect("module unload", (ULONG) txm_module_manager_unload(&test_module), (ULONG) TX_SUCCESS);
         harness_expect("module memory returned", harness_module_pool_available(), available_before);
     }
+#ifdef MODULE_QEMU_CORTEX_M55
+    harness_expect("delete semaphore for handle check", (ULONG) tx_semaphore_delete(&test_semaphore), (ULONG) TX_SUCCESS);
+#if !defined(TX_SINGLE_MODE_SECURE) && !defined(TX_TIMER_PROCESS_IN_ISR)
+    harness_expect("free manager thread secure stack",
+                   (ULONG) tx_thread_secure_stack_free(tx_thread_identify()), (ULONG) TX_SUCCESS);
+    harness_expect("manager thread secure stack released",
+                   (ULONG) (tx_thread_identify() -> tx_thread_secure_stack_context == TX_NULL), (ULONG) TX_TRUE);
+#endif
+#endif
 }

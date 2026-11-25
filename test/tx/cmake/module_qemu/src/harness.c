@@ -251,6 +251,20 @@ static VOID  harness_thread_entry(ULONG thread_input)
 
 int  main(void)
 {
+#ifdef MODULE_QEMU_CORTEX_M55
+    /* No thread exists before kernel entry. Check both notification modes.  */
+    _txm_module_manager_memory_fault_handler();
+    harness_expect("early fault without notification", harness_fault_count, 0UL);
+    harness_expect("register early fault notification",
+                   (ULONG) txm_module_manager_memory_fault_notify(harness_fault_notify), (ULONG) TX_SUCCESS);
+    _txm_module_manager_memory_fault_handler();
+    harness_expect("early fault reported", harness_fault_count, 1UL);
+    harness_expect("early fault has no thread", (ULONG) (harness_fault_thread == TX_NULL), (ULONG) TX_TRUE);
+    harness_expect("early fault has no module", (ULONG) (harness_fault_module == TX_NULL), (ULONG) TX_TRUE);
+    harness_expect("clear early fault notification",
+                   (ULONG) txm_module_manager_memory_fault_notify(TX_NULL), (ULONG) TX_SUCCESS);
+    harness_fault_count = 0UL;
+#endif
     tx_kernel_enter();
     return(0);
 }
