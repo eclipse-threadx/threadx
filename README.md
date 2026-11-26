@@ -94,27 +94,27 @@ The master branch has the most recent code with all new features and bug fixes. 
 
 ### ThreadX
 ```
-arc_em      cortex_a12        cortex_m0     cortex_r4
-arc_hs      cortex_a15        cortex_m23    cortex_r5
-arm11       cortex_a17        cortex_m3     cortex_r7
-arm9        cortex_a34        cortex_m33
-c667x       cortex_a35        cortex_m4
-linux       cortex_a5         cortex_m55
-risc-v32    cortex_a53        cortex_m7
-rxv1        cortex_a55        cortex_m85
-rxv2        cortex_a57
-rxv3        cortex_a5x
-win32       cortex_a65
-xtensa      cortex_a65ae
-            cortex_a7
-            cortex_a72
-            cortex_a73
-            cortex_a75
-            cortex_a76
-            cortex_a76ae
-            cortex_a77
-            cortex_a8
-            cortex_a9
+arc_em           cortex_a12        cortex_m0     cortex_r4
+arc_hs           cortex_a15        cortex_m23    cortex_r5
+arm11            cortex_a17        cortex_m3     cortex_r7
+arm9             cortex_a34        cortex_m33
+c667x            cortex_a35        cortex_m4
+linux            cortex_a5         cortex_m55
+risc-v32         cortex_a53        cortex_m7
+rxv1             cortex_a55        cortex_m85
+rxv2             cortex_a57
+rxv3             cortex_a5x
+tricore_tc1_6_2  cortex_a65
+win32            cortex_a65ae
+xtensa           cortex_a7
+                 cortex_a72
+                 cortex_a73
+                 cortex_a75
+                 cortex_a76
+                 cortex_a76ae
+                 cortex_a77
+                 cortex_a8
+                 cortex_a9
 ```
 
 ### ThreadX Modules
