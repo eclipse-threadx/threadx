@@ -34,7 +34,7 @@ VOID  harness_check_services(ULONG cycle)
     harness_expect("module object allocation", MODULE_SHARED[MODULE_OUT_OBJECT_STATUS], (ULONG) TX_SUCCESS);
     harness_expect("module object creation and queue send", MODULE_SHARED[MODULE_OUT_CREATE_STATUS], (ULONG) TX_SUCCESS);
     harness_expect("module worker received the message", MODULE_SHARED[MODULE_OUT_QUEUE_VALUE], MODULE_QUEUE_MESSAGE);
-    harness_expect("module worker ran once", MODULE_SHARED[MODULE_OUT_WORKER_RUNS], 1UL);
+    harness_expect("module worker ran before and after reset", MODULE_SHARED[MODULE_OUT_WORKER_RUNS], 2UL);
     harness_expect("module semaphore get", MODULE_SHARED[MODULE_OUT_SEMAPHORE_STATUS], (ULONG) TX_SUCCESS);
     harness_expect("module sleep lasted its ticks",
                    (ULONG) (MODULE_SHARED[MODULE_OUT_SLEEP_TICKS] >= EXPECTED_SLEEP_TICKS), (ULONG) TX_TRUE);

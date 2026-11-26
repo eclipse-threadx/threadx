@@ -134,6 +134,13 @@ TXM_MODULE_THREAD_ENTRY_INFO    *thread_entry_info;
         /* Get the module instance.  */
         module_instance =  thread_ptr -> tx_thread_module_instance_ptr;
 
+        /* A module can complete or be terminated while in a kernel call.
+           Restore the module stack and mode before building its entry frame.  */
+        thread_ptr -> tx_thread_stack_start =  thread_ptr -> tx_thread_module_stack_start;
+        thread_ptr -> tx_thread_stack_end =    thread_ptr -> tx_thread_module_stack_end;
+        thread_ptr -> tx_thread_stack_size =   thread_ptr -> tx_thread_module_stack_size;
+        thread_ptr -> tx_thread_module_current_user_mode = thread_ptr -> tx_thread_module_user_mode;
+
         /* Execute Port-Specific completion processing. If needed, it is typically defined in txm_module_port.h.  */
         TXM_MODULE_MANAGER_THREAD_RESET_PORT_COMPLETION(thread_ptr, module_instance)
 
@@ -148,11 +155,8 @@ TXM_MODULE_THREAD_ENTRY_INFO    *thread_entry_info;
         TX_MEMSET(thread_ptr -> tx_thread_stack_start, ((UCHAR) TX_STACK_FILL), thread_ptr -> tx_thread_stack_size);
 #endif
 
-        /* Setup pointer to the thread entry information structure, which will live at the top of each
-           module thread's stack. This will allow the module thread entry function to avoid direct
-           access to the actual thread control block.  */
-        thread_entry_info =  (TXM_MODULE_THREAD_ENTRY_INFO *) (((UCHAR *) thread_ptr -> tx_thread_stack_end) + (2*sizeof(ULONG)) + 1);
-        thread_entry_info =  (TXM_MODULE_THREAD_ENTRY_INFO *) (((ALIGN_TYPE)(thread_entry_info)) & (~0x3));
+        /* Reuse the entry information above the module stack.  */
+        thread_entry_info =  (TXM_MODULE_THREAD_ENTRY_INFO *) thread_ptr -> tx_thread_module_entry_info_ptr;
 
         /* Place the thread entry information pointer in the thread control block so it can be picked up
            in the following stack build function. This is supplied to the module's shell entry function

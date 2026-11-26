@@ -71,18 +71,18 @@ static VOID  record_status(ULONG word, UINT status)
 static VOID  worker_entry(ULONG thread_input)
 {
 ULONG   message;
+ULONG   control;
 
-    (VOID) thread_input;
-
-    for (;;)
+    __asm__ volatile ("mrs %0, control" : "=r"(control));
+    message = 0UL;
+    if (tx_queue_receive(message_queue, &message, WAIT_TICKS) == TX_SUCCESS)
     {
-        message = 0UL;
-        if (tx_queue_receive(message_queue, &message, TX_WAIT_FOREVER) == TX_SUCCESS)
+        if ((thread_input == MODULE_QUEUE_MESSAGE) && (control == MODULE_SHARED[MODULE_OUT_CONTROL]))
         {
             MODULE_SHARED[MODULE_OUT_QUEUE_VALUE] = message;
-            MODULE_SHARED[MODULE_OUT_WORKER_RUNS] = MODULE_SHARED[MODULE_OUT_WORKER_RUNS] + 1UL;
-            (VOID) tx_semaphore_put(done_semaphore);
+            MODULE_SHARED[MODULE_OUT_WORKER_RUNS]++;
         }
+        (VOID) tx_semaphore_put(done_semaphore);
     }
 }
 
@@ -109,13 +109,19 @@ ULONG   kernel_word;
     record_status(MODULE_OUT_CREATE_STATUS, tx_queue_create(message_queue, "module queue", TX_1_ULONG,
                                                             queue_storage, sizeof(queue_storage)));
     record_status(MODULE_OUT_CREATE_STATUS, tx_semaphore_create(done_semaphore, "module semaphore", 0UL));
-    record_status(MODULE_OUT_CREATE_STATUS, tx_thread_create(worker_thread, "module worker", worker_entry, 0UL,
+    record_status(MODULE_OUT_CREATE_STATUS, tx_thread_create(worker_thread, "module worker", worker_entry,
+                                                             MODULE_QUEUE_MESSAGE,
                                                              worker_stack, sizeof(worker_stack),
-                                                             2U, 2U, TX_NO_TIME_SLICE, TX_AUTO_START));
+                                                             0U, 0U, TX_NO_TIME_SLICE, TX_AUTO_START));
 
     message = MODULE_QUEUE_MESSAGE;
     record_status(MODULE_OUT_CREATE_STATUS, tx_queue_send(message_queue, &message, TX_NO_WAIT));
-    MODULE_SHARED[MODULE_OUT_SEMAPHORE_STATUS] = (ULONG) tx_semaphore_get(done_semaphore, WAIT_TICKS);
+    record_status(MODULE_OUT_SEMAPHORE_STATUS, tx_semaphore_get(done_semaphore, WAIT_TICKS));
+
+    record_status(MODULE_OUT_CREATE_STATUS, tx_thread_reset(worker_thread));
+    record_status(MODULE_OUT_CREATE_STATUS, tx_thread_resume(worker_thread));
+    record_status(MODULE_OUT_CREATE_STATUS, tx_queue_send(message_queue, &message, TX_NO_WAIT));
+    record_status(MODULE_OUT_SEMAPHORE_STATUS, tx_semaphore_get(done_semaphore, WAIT_TICKS));
 
     start_time = tx_time_get();
     (VOID) tx_thread_sleep(SLEEP_TICKS);
