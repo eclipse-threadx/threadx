@@ -224,6 +224,7 @@ extern   "C" {
 #define TXM_QUEUE_SEND_CALLBACK                             2
 #define TXM_SEMAPHORE_PUT_CALLBACK                          3
 #define TXM_THREAD_ENTRY_EXIT_CALLBACK                      4
+#define TXM_TIMER_CALLBACK_PTR                              5
 
 
 /* Determine the ThreadX kernel API call IDs.  */
@@ -324,6 +325,8 @@ extern   "C" {
 #define TXM_MODULE_OBJECT_POINTER_GET_EXTENDED_CALL         94
 #define TXM_MODULE_OBJECT_ALLOCATE_CALL                     95
 #define TXM_MODULE_OBJECT_DEALLOCATE_CALL                   96
+#define TXM_THREAD_CREATE_PTR_CALL                          97
+#define TXM_TIMER_CREATE_PTR_CALL                           98
 
 #define TXM_MODULE_PORT_EXTENSION_API_ID_START              500
 #define TXM_MODULE_PORT_EXTENSION_API_ID_END                999
@@ -493,6 +496,10 @@ typedef struct TXM_MODULE_THREAD_ENTRY_INFO_STRUCT
     VOID                *txm_module_thread_entry_info_reserved;
     ALIGN_TYPE          (*txm_module_thread_entry_info_kernel_call_dispatcher)(ULONG kernel_request, ALIGN_TYPE param_1, ALIGN_TYPE param_2, ALIGN_TYPE param_3);
     TXM_MODULE_THREAD_ENTRY_INFO_USER_EXTENSION
+#ifdef TX_ENABLE_POINTER_CONTEXT
+    VOID                (*txm_module_thread_entry_info_entry_ptr)(VOID *input);
+    VOID                *txm_module_thread_entry_info_parameter_ptr;
+#endif
 } TXM_MODULE_THREAD_ENTRY_INFO;
 
 
@@ -520,6 +527,27 @@ typedef struct TXM_MODULE_ALLOCATED_OBJECT_STRUCT
    manager when the module is created and started.  */
 
 extern ALIGN_TYPE (*_txm_module_kernel_call_dispatcher)(ULONG type, ALIGN_TYPE param_1, ALIGN_TYPE param_2, ALIGN_TYPE param3);
+
+
+#ifdef TXM_MODULE
+#ifdef TX_ENABLE_POINTER_CONTEXT
+/* A pointer entry uses the typed fields reserved at the end of the entry info.  */
+static inline VOID _txm_module_thread_entry_call(const TXM_MODULE_THREAD_ENTRY_INFO *thread_info)
+{
+    if (thread_info -> txm_module_thread_entry_info_entry == TX_NULL)
+    {
+        (thread_info -> txm_module_thread_entry_info_entry_ptr)(thread_info -> txm_module_thread_entry_info_parameter_ptr);
+    }
+    else
+    {
+        (thread_info -> txm_module_thread_entry_info_entry)(thread_info -> txm_module_thread_entry_info_parameter);
+    }
+}
+#define TXM_MODULE_THREAD_ENTRY_CALL(info) _txm_module_thread_entry_call(info)
+#else
+#define TXM_MODULE_THREAD_ENTRY_CALL(info) ((info) -> txm_module_thread_entry_info_entry)((info) -> txm_module_thread_entry_info_parameter)
+#endif
+#endif
 
 
 /* Define specific module function prototypes.  */
@@ -638,6 +666,13 @@ UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHA
                                VOID (*entry_function)(ULONG), ULONG entry_input,
                                VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
                                ULONG time_slice, UINT auto_start, UINT thread_control_block_size, TXM_MODULE_INSTANCE *module_instance);
+#ifdef TX_ENABLE_POINTER_CONTEXT
+UINT  _txm_module_manager_thread_create_ptr(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
+                              VOID (*shell_function)(TX_THREAD *, TXM_MODULE_INSTANCE *),
+                              VOID (*entry_function)(VOID *), VOID *entry_input,
+                              VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
+                              ULONG time_slice, UINT auto_start, UINT thread_control_block_size, TXM_MODULE_INSTANCE *module_instance);
+#endif
 UINT  _txm_module_manager_thread_reset(TX_THREAD *thread_ptr);
 VOID  _txm_module_manager_name_build(CHAR *module_name, CHAR *thread_name, CHAR *combined_name);
 VOID  _txm_module_manager_thread_stack_build(TX_THREAD *thread_ptr, VOID (*shell_function)(TX_THREAD *, TXM_MODULE_INSTANCE *));
@@ -679,6 +714,9 @@ VOID  _txm_module_manager_queue_notify_trampoline(TX_QUEUE *queue_ptr);
 VOID  _txm_module_manager_semaphore_notify_trampoline(TX_SEMAPHORE *semaphore_ptr);
 VOID  _txm_module_manager_thread_notify_trampoline(TX_THREAD *thread_ptr, UINT type);
 VOID  _txm_module_manager_timer_notify_trampoline(ULONG id);
+#ifdef TX_ENABLE_POINTER_CONTEXT
+VOID  _txm_module_manager_timer_notify_pointer(VOID *owner, VOID (*callback)(VOID *), VOID *id);
+#endif
 
 
 /* Define port specific module manager prototypes.  */

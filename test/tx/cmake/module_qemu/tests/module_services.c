@@ -55,6 +55,13 @@ static TX_SEMAPHORE *done_semaphore;
 static ULONG        worker_stack[WORKER_STACK_SIZE / sizeof(ULONG)];
 static ULONG        queue_storage[4];
 
+#ifdef TX_ENABLE_POINTER_CONTEXT
+static TX_THREAD    *pointer_thread;
+static TX_TIMER     *context_timer;
+static ULONG        pointer_stack[WORKER_STACK_SIZE / sizeof(ULONG)];
+static ULONG        callback_context;
+#endif
+
 VOID    module_start(ULONG id);
 
 
@@ -71,20 +78,112 @@ static VOID  record_status(ULONG word, UINT status)
 static VOID  worker_entry(ULONG thread_input)
 {
 ULONG   message;
+ULONG   control;
 
-    (VOID) thread_input;
-
-    for (;;)
+    __asm__ volatile ("mrs %0, control" : "=r"(control));
+    message = 0UL;
+    if (tx_queue_receive(message_queue, &message, WAIT_TICKS) == TX_SUCCESS)
     {
-        message = 0UL;
-        if (tx_queue_receive(message_queue, &message, TX_WAIT_FOREVER) == TX_SUCCESS)
+        if ((thread_input == MODULE_QUEUE_MESSAGE) && (control == MODULE_SHARED[MODULE_OUT_CONTROL]))
         {
             MODULE_SHARED[MODULE_OUT_QUEUE_VALUE] = message;
-            MODULE_SHARED[MODULE_OUT_WORKER_RUNS] = MODULE_SHARED[MODULE_OUT_WORKER_RUNS] + 1UL;
-            (VOID) tx_semaphore_put(done_semaphore);
+            MODULE_SHARED[MODULE_OUT_WORKER_RUNS]++;
         }
+        (VOID) tx_semaphore_put(done_semaphore);
     }
 }
+
+#ifdef TX_ENABLE_POINTER_CONTEXT
+/* Count a thread entry only if the pointer still names module data.  */
+static VOID  pointer_worker_entry(VOID *context)
+{
+    if (context == &callback_context)
+    {
+        MODULE_SHARED[MODULE_OUT_POINTER_THREADS]++;
+    }
+    (VOID) tx_semaphore_put(done_semaphore);
+}
+
+/* Count a pointer timer callback in the module's execution mode.  */
+static VOID  pointer_timer_entry(VOID *context)
+{
+ULONG control;
+
+    __asm__ volatile ("mrs %0, control" : "=r"(control));
+    if ((context == &callback_context) && (control == MODULE_SHARED[MODULE_OUT_CONTROL]))
+    {
+        MODULE_SHARED[MODULE_OUT_POINTER_TIMERS]++;
+    }
+    (VOID) tx_semaphore_put(done_semaphore);
+}
+
+/* Check that the legacy timer still passes its scalar input.  */
+static VOID  legacy_timer_entry(ULONG input)
+{
+    if (input == MODULE_QUEUE_MESSAGE)
+    {
+        MODULE_SHARED[MODULE_OUT_LEGACY_TIMERS]++;
+    }
+    (VOID) tx_semaphore_put(done_semaphore);
+}
+
+/* Exercise pointer delivery, reset, and timer reuse through module calls.  */
+static VOID  check_pointer_services(VOID)
+{
+ULONG status_word = MODULE_OUT_POINTER_STATUS;
+
+    record_status(status_word, txm_module_object_allocate((VOID **) &pointer_thread, sizeof(TX_THREAD)));
+    record_status(status_word, txm_module_object_allocate((VOID **) &context_timer, sizeof(TX_TIMER)));
+    if (MODULE_SHARED[status_word] != TX_SUCCESS)
+    {
+        return;
+    }
+
+    if (tx_thread_create_ptr(pointer_thread, "no entry", TX_NULL, &callback_context,
+                             pointer_stack, sizeof(pointer_stack), 0U, 0U,
+                             TX_NO_TIME_SLICE, TX_DONT_START) != TX_PTR_ERROR)
+    {
+        record_status(status_word, TX_NOT_DONE);
+    }
+
+    /* The higher-priority worker completes before the start thread resets it.  */
+    record_status(status_word, tx_thread_create_ptr(pointer_thread, "pointer worker", pointer_worker_entry,
+                                                     &callback_context, pointer_stack, sizeof(pointer_stack),
+                                                     0U, 0U, TX_NO_TIME_SLICE, TX_AUTO_START));
+    record_status(status_word, tx_semaphore_get(done_semaphore, WAIT_TICKS));
+    record_status(status_word, tx_thread_reset(pointer_thread));
+    record_status(status_word, tx_thread_resume(pointer_thread));
+    record_status(status_word, tx_semaphore_get(done_semaphore, WAIT_TICKS));
+
+    record_status(status_word, tx_timer_create_ptr(context_timer, "pointer timer", pointer_timer_entry,
+                                                    &callback_context, 1UL, 0UL, TX_AUTO_ACTIVATE));
+    record_status(status_word, tx_semaphore_get(done_semaphore, WAIT_TICKS));
+    record_status(status_word, tx_timer_delete(context_timer));
+
+    record_status(status_word, txm_module_object_allocate((VOID **) &context_timer, sizeof(TX_TIMER)));
+    if (MODULE_SHARED[status_word] != TX_SUCCESS)
+    {
+        return;
+    }
+    record_status(status_word, tx_timer_create_ptr(context_timer, "silent timer", TX_NULL,
+                                                    &callback_context, 1UL, 0UL, TX_AUTO_ACTIVATE));
+    (VOID) tx_thread_sleep(SLEEP_TICKS);
+    if (tx_semaphore_get(done_semaphore, TX_NO_WAIT) != TX_NO_INSTANCE)
+    {
+        record_status(status_word, TX_NOT_DONE);
+    }
+    record_status(status_word, tx_timer_delete(context_timer));
+
+    record_status(status_word, txm_module_object_allocate((VOID **) &context_timer, sizeof(TX_TIMER)));
+    if (MODULE_SHARED[status_word] != TX_SUCCESS)
+    {
+        return;
+    }
+    record_status(status_word, tx_timer_create(context_timer, "legacy timer", legacy_timer_entry,
+                                                MODULE_QUEUE_MESSAGE, 1UL, 0UL, TX_AUTO_ACTIVATE));
+    record_status(status_word, tx_semaphore_get(done_semaphore, WAIT_TICKS));
+}
+#endif
 
 
 VOID  module_start(ULONG id)
@@ -109,17 +208,27 @@ ULONG   kernel_word;
     record_status(MODULE_OUT_CREATE_STATUS, tx_queue_create(message_queue, "module queue", TX_1_ULONG,
                                                             queue_storage, sizeof(queue_storage)));
     record_status(MODULE_OUT_CREATE_STATUS, tx_semaphore_create(done_semaphore, "module semaphore", 0UL));
-    record_status(MODULE_OUT_CREATE_STATUS, tx_thread_create(worker_thread, "module worker", worker_entry, 0UL,
+    record_status(MODULE_OUT_CREATE_STATUS, tx_thread_create(worker_thread, "module worker", worker_entry,
+                                                             MODULE_QUEUE_MESSAGE,
                                                              worker_stack, sizeof(worker_stack),
-                                                             2U, 2U, TX_NO_TIME_SLICE, TX_AUTO_START));
+                                                             0U, 0U, TX_NO_TIME_SLICE, TX_AUTO_START));
 
     message = MODULE_QUEUE_MESSAGE;
     record_status(MODULE_OUT_CREATE_STATUS, tx_queue_send(message_queue, &message, TX_NO_WAIT));
-    MODULE_SHARED[MODULE_OUT_SEMAPHORE_STATUS] = (ULONG) tx_semaphore_get(done_semaphore, WAIT_TICKS);
+    record_status(MODULE_OUT_SEMAPHORE_STATUS, tx_semaphore_get(done_semaphore, WAIT_TICKS));
+
+    record_status(MODULE_OUT_CREATE_STATUS, tx_thread_reset(worker_thread));
+    record_status(MODULE_OUT_CREATE_STATUS, tx_thread_resume(worker_thread));
+    record_status(MODULE_OUT_CREATE_STATUS, tx_queue_send(message_queue, &message, TX_NO_WAIT));
+    record_status(MODULE_OUT_SEMAPHORE_STATUS, tx_semaphore_get(done_semaphore, WAIT_TICKS));
 
     start_time = tx_time_get();
     (VOID) tx_thread_sleep(SLEEP_TICKS);
     MODULE_SHARED[MODULE_OUT_SLEEP_TICKS] = tx_time_get() - start_time;
+
+#ifdef TX_ENABLE_POINTER_CONTEXT
+    check_pointer_services();
+#endif
 
     kernel_word = MODULE_SHARED[MODULE_IN_KERNEL_WORD];
     if (kernel_word != 0UL)

@@ -118,6 +118,10 @@ set(regression_test_cases
     ${SOURCE_DIR}/threadx_trace_entry_update_test.c
     ${SOURCE_DIR}/threadx_initialize_kernel_setup_test.c)
 
+if(TX_ENABLE_POINTER_CONTEXT)
+  list(APPEND regression_test_cases ${SOURCE_DIR}/threadx_pointer_callback_test.c)
+endif()
+
 add_custom_command(
   OUTPUT ${GENERATED_LOW_LEVEL_SOURCE}
   COMMAND ${CMAKE_COMMAND}

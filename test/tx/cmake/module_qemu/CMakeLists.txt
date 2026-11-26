@@ -46,6 +46,7 @@ project(threadx_module_qemu LANGUAGES C ASM)
 
 set(MODULE_QEMU_PORT "cortex_m3" CACHE STRING "Cortex-M module port to build and run")
 set_property(CACHE MODULE_QEMU_PORT PROPERTY STRINGS cortex_m3 cortex_m4)
+option(MODULE_QEMU_POINTER_CONTEXT "Exercise the pointer-context module APIs" OFF)
 
 if(MODULE_QEMU_PORT STREQUAL "cortex_m3")
     set(PORT_CPU_FLAGS -mcpu=cortex-m3 -mthumb)
@@ -66,6 +67,10 @@ message(STATUS "Module port: ${MODULE_QEMU_PORT}, QEMU machine: ${QEMU_MACHINE}"
 
 add_compile_options(${PORT_CPU_FLAGS} -g -O0 -ffunction-sections -fdata-sections)
 add_link_options(${PORT_CPU_FLAGS})
+
+if(MODULE_QEMU_POINTER_CONTEXT)
+    add_compile_definitions(TX_ENABLE_POINTER_CONTEXT)
+endif()
 
 # ---------------------------------------------------------------------------
 # The kernel and the Module Manager, built with the module port's headers.

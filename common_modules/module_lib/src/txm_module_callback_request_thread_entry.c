@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -82,6 +83,9 @@ TX_QUEUE                    *request_queue;
 TXM_MODULE_CALLBACK_MESSAGE callback_message;
 ULONG                       activation_count;
 VOID                        (*timer_callback)(ULONG);
+#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_TIMER_CREATE_PTR_CALL_NOT_USED)
+VOID                        (*timer_callback_ptr)(VOID *);
+#endif
 VOID                        (*events_set_notify)(TX_EVENT_FLAGS_GROUP *);
 VOID                        (*semaphore_put_notify)(TX_SEMAPHORE *);
 VOID                        (*queue_send_notify)(TX_QUEUE *);
@@ -132,6 +136,17 @@ UINT                        status;
                 (timer_callback)((ULONG) callback_message.txm_module_callback_message_param_1);
 
                 break;
+
+#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_TIMER_CREATE_PTR_CALL_NOT_USED)
+            case TXM_TIMER_CALLBACK_PTR:
+
+                /* Restore the original types used by the module caller.
+                   MISRA C:2023 Rules 11.1 and 11.6 apply to the ABI casts.  */
+                timer_callback_ptr = (VOID (*)(VOID *)) callback_message.txm_module_callback_message_application_function;
+                (timer_callback_ptr)((VOID *) callback_message.txm_module_callback_message_param_1);
+
+                break;
+#endif
 
             case TXM_EVENTS_SET_CALLBACK:
 

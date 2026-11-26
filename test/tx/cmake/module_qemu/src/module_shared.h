@@ -59,6 +59,10 @@
 #define MODULE_OUT_KERNEL_READ_DONE ((ULONG) 17UL)  /* Kernel word read completed           */
 #define MODULE_OUT_KERNEL_VALUE     ((ULONG) 18UL)  /* Value read from the kernel word      */
 #define MODULE_OUT_CONTROL          ((ULONG) 19UL)  /* CONTROL as seen by the start thread  */
+#define MODULE_OUT_POINTER_STATUS   ((ULONG) 20UL)  /* First pointer API error              */
+#define MODULE_OUT_POINTER_THREADS  ((ULONG) 21UL)  /* Thread entries with intact context   */
+#define MODULE_OUT_POINTER_TIMERS   ((ULONG) 22UL)  /* Pointer callbacks with intact context */
+#define MODULE_OUT_LEGACY_TIMERS    ((ULONG) 23UL)  /* Legacy callbacks with intact input   */
 #define MODULE_DONE                 ((ULONG) 31UL)
 
 /* The context switch test points a thread's stack at the bottom of this area,

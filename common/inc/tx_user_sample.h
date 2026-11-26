@@ -197,6 +197,14 @@
 #endif
 */
 
+/* Enable tx_thread_create_ptr and tx_timer_create_ptr with VOID * contexts.
+   Use the same setting for the kernel, applications, Module Manager, module
+   library, and loadable modules. It changes the TX_THREAD and TX_TIMER sizes.  */
+
+/*
+#define TX_ENABLE_POINTER_CONTEXT
+*/
+
 /* Determine if the notify callback option should be disabled. By default, notify callbacks are
    enabled. If the application does not use notify callbacks, they may be disabled to reduce
    code size and improve performance.  */

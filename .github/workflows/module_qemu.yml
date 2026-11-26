@@ -122,30 +122,30 @@ jobs:
 
         status=0
         for port in cortex_m3 cortex_m4; do
-          build="build/module_qemu_$port"
-          echo ""
-          echo "=============================================================="
-          echo "== $port"
-          echo "=============================================================="
+          for pointer_context in OFF ON; do
+            config="$port (pointer context $pointer_context)"
+            build="build/module_qemu_${port}_$pointer_context"
+            echo "== $config"
 
-          if ! cmake -S test/tx/cmake/module_qemu -B "$build" -G Ninja \
-                  -DCMAKE_TOOLCHAIN_FILE="$PWD/test/tx/cmake/module_qemu/arm-none-eabi-qemu.cmake" \
-                  -DMODULE_QEMU_PORT="$port"; then
-            echo "::error::$port: CMake configure failed"
-            status=1
-            continue
-          fi
-          if ! cmake --build "$build"; then
-            echo "::error::$port: the images did not build"
-            status=1
-            continue
-          fi
-          # --no-tests=error: the tests are registered only when QEMU and
-          # Python are found, and ctest's default would pass on none.
-          if ! ctest --test-dir "$build" --output-on-failure --no-tests=error; then
-            echo "::error::$port: one or more images failed on QEMU, or no tests were registered"
-            status=1
-          fi
+            if ! cmake -S test/tx/cmake/module_qemu -B "$build" -G Ninja \
+                    -DCMAKE_TOOLCHAIN_FILE="$PWD/test/tx/cmake/module_qemu/arm-none-eabi-qemu.cmake" \
+                    -DMODULE_QEMU_PORT="$port" -DMODULE_QEMU_POINTER_CONTEXT="$pointer_context"; then
+              echo "::error::$config: CMake configure failed"
+              status=1
+              continue
+            fi
+            if ! cmake --build "$build"; then
+              echo "::error::$config: the images did not build"
+              status=1
+              continue
+            fi
+            # --no-tests=error: the tests are registered only when QEMU and
+            # Python are found, and ctest's default would pass on none.
+            if ! ctest --test-dir "$build" --output-on-failure --no-tests=error; then
+              echo "::error::$config: one or more images failed on QEMU, or no tests were registered"
+              status=1
+            fi
+          done
         done
 
         exit $status

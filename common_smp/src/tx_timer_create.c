@@ -69,10 +69,24 @@
 /*                                                                        */
 /*    Application Code                                                    */
 /*                                                                        */
+#ifdef TX_ENABLE_POINTER_CONTEXT
+static UINT  _tx_timer_create_initial(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
+                                      VOID (*expiration_function)(ULONG id), ULONG expiration_input,
+                                      VOID (*expiration_function_ptr)(VOID *id), VOID *expiration_input_ptr,
+                                      TX_TIMER_POINTER_DISPATCH dispatch, VOID *owner,
+                                      ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate);
+
 /**************************************************************************/
+static UINT  _tx_timer_create_initial(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
+                                      VOID (*expiration_function)(ULONG id), ULONG expiration_input,
+                                      VOID (*expiration_function_ptr)(VOID *id), VOID *expiration_input_ptr,
+                                      TX_TIMER_POINTER_DISPATCH dispatch, VOID *owner,
+                                      ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate)
+#else
 UINT  _tx_timer_create(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
             VOID (*expiration_function)(ULONG id), ULONG expiration_input,
             ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate)
+#endif
 {
 
 TX_INTERRUPT_SAVE_AREA
@@ -90,6 +104,12 @@ TX_TIMER        *previous_timer;
     timer_ptr -> tx_timer_internal.tx_timer_internal_re_initialize_ticks =  reschedule_ticks;
     timer_ptr -> tx_timer_internal.tx_timer_internal_timeout_function =     expiration_function;
     timer_ptr -> tx_timer_internal.tx_timer_internal_timeout_param =        expiration_input;
+#ifdef TX_ENABLE_POINTER_CONTEXT
+    timer_ptr -> tx_timer_timeout_function_ptr =                         expiration_function_ptr;
+    timer_ptr -> tx_timer_timeout_param_ptr =                            expiration_input_ptr;
+    timer_ptr -> tx_timer_timeout_dispatch =                             dispatch;
+    timer_ptr -> tx_timer_timeout_owner =                                owner;
+#endif
 
 #ifdef TX_THREAD_SMP_ONLY_CORE_0_DEFAULT
 
@@ -168,3 +188,96 @@ TX_TIMER        *previous_timer;
     return(TX_SUCCESS);
 }
 
+#ifdef TX_ENABLE_POINTER_CONTEXT
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_timer_create                                    PORTABLE SMP     */
+/*                                                           6.1          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function creates an application timer with ULONG input.        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    timer_ptr                             Pointer to timer control blk  */
+/*    name_ptr                              Pointer to timer name         */
+/*    expiration_function                   Function to call on expiration*/
+/*    expiration_input                      32-bit input value for timer  */
+/*    initial_ticks                         Initial expiration ticks      */
+/*    reschedule_ticks                      Reschedule ticks              */
+/*    auto_activate                         Automatic activation flag     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_SUCCESS                            Successful completion status  */
+/*                                                                        */
+/**************************************************************************/
+UINT  _tx_timer_create(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
+            VOID (*expiration_function)(ULONG id), ULONG expiration_input,
+            ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate)
+{
+    return(_tx_timer_create_initial(timer_ptr, name_ptr,
+                                    expiration_function, expiration_input,
+                                    TX_NULL, TX_NULL, TX_NULL, TX_NULL,
+                                    initial_ticks, reschedule_ticks, auto_activate));
+}
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_timer_create_ptr                                PORTABLE SMP     */
+/*                                                           6.1          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function creates an application timer with pointer context.    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    timer_ptr                             Pointer to timer control blk  */
+/*    name_ptr                              Pointer to timer name         */
+/*    expiration_function                   Function to call on expiration*/
+/*    expiration_input                      Pointer input value for timer */
+/*    initial_ticks                         Initial expiration ticks      */
+/*    reschedule_ticks                      Reschedule ticks              */
+/*    auto_activate                         Automatic activation flag     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_SUCCESS                            Successful completion status  */
+/*                                                                        */
+/**************************************************************************/
+UINT  _tx_timer_create_ptr(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
+            VOID (*expiration_function)(VOID *id), VOID *expiration_input,
+            ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate)
+{
+    return(_tx_timer_create_initial(timer_ptr, name_ptr,
+                                    TX_NULL, 0,
+                                    expiration_function, expiration_input, TX_NULL, TX_NULL,
+                                    initial_ticks, reschedule_ticks, auto_activate));
+}
+
+/* Create a pointer timer with owner-specific callback delivery.  */
+UINT  _tx_timer_create_ptr_dispatch(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
+                            VOID (*expiration_function)(VOID *), VOID *expiration_input,
+                            TX_TIMER_POINTER_DISPATCH dispatch, VOID *owner,
+                            ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate)
+{
+    return(_tx_timer_create_initial(timer_ptr, name_ptr, TX_NULL, 0UL,
+                                    expiration_function, expiration_input, dispatch, owner,
+                                    initial_ticks, reschedule_ticks, auto_activate));
+}
+#endif /* TX_ENABLE_POINTER_CONTEXT */

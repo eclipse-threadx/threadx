@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -96,6 +97,9 @@ UINT                            status;
 
             /* Does this entry match the new callback message?  */
             if ((queued_message -> txm_module_callback_message_application_function == callback_message -> txm_module_callback_message_application_function) &&
+#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_TIMER_CREATE_PTR_CALL_NOT_USED)
+                (queued_message -> txm_module_callback_message_type == callback_message -> txm_module_callback_message_type) &&
+#endif
                 (queued_message -> txm_module_callback_message_param_1 == callback_message -> txm_module_callback_message_param_1) &&
                 (queued_message -> txm_module_callback_message_param_2 == callback_message -> txm_module_callback_message_param_2) &&
                 (queued_message -> txm_module_callback_message_param_3 == callback_message -> txm_module_callback_message_param_3) &&

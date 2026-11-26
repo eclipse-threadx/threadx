@@ -87,3 +87,25 @@ ALIGN_TYPE extra_parameters[6];
     return(return_value);
 }
 #endif
+
+#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_TIMER_CREATE_PTR_CALL_NOT_USED)
+/* Pack a pointer timer request for the module manager.  */
+UINT  _txe_timer_create_ptr(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
+            VOID (*expiration_function)(VOID *), VOID *expiration_input,
+            ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate, UINT timer_control_block_size)
+{
+ALIGN_TYPE extra_parameters[6];
+
+    /* The module dispatcher carries addresses in ABI words.
+       MISRA C:2023 Rules 11.1 and 11.6 apply to the packing casts.  */
+    extra_parameters[0] = (ALIGN_TYPE) expiration_function;
+    extra_parameters[1] = (ALIGN_TYPE) expiration_input;
+    extra_parameters[2] = (ALIGN_TYPE) initial_ticks;
+    extra_parameters[3] = (ALIGN_TYPE) reschedule_ticks;
+    extra_parameters[4] = (ALIGN_TYPE) auto_activate;
+    extra_parameters[5] = (ALIGN_TYPE) timer_control_block_size;
+
+    return((UINT) (_txm_module_kernel_call_dispatcher)(TXM_TIMER_CREATE_PTR_CALL, (ALIGN_TYPE) timer_ptr,
+                                                       (ALIGN_TYPE) name_ptr, (ALIGN_TYPE) extra_parameters));
+}
+#endif

@@ -190,6 +190,14 @@
 #endif
 */
 
+/* Enable tx_thread_create_ptr and tx_timer_create_ptr with VOID * contexts.
+   Use the same setting when building ThreadX and its applications, since
+   this option adds callback storage to TX_THREAD and TX_TIMER.  */
+
+/*
+#define TX_ENABLE_POINTER_CONTEXT
+*/
+
 /* Determine if the notify callback option should be disabled. By default, notify callbacks are
    enabled. If the application does not use notify callbacks, they may be disabled to reduce
    code size and improve performance.  */

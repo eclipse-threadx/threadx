@@ -2055,7 +2055,7 @@ VOID (*semaphore_put_notify)(TX_SEMAPHORE *);
 }
 #endif
 
-#ifndef TXM_THREAD_CREATE_CALL_NOT_USED
+#if !defined(TXM_THREAD_CREATE_CALL_NOT_USED) || (defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_THREAD_CREATE_PTR_CALL_NOT_USED))
 /* UINT _txe_thread_create(
     TX_THREAD *thread_ptr, -> param_0
     TX_NAME_CONST CHAR *name_ptr, -> param_1
@@ -2069,10 +2069,17 @@ VOID (*semaphore_put_notify)(TX_SEMAPHORE *);
     UINT auto_start, -> extra_parameters[7]
     UINT thread_control_block_size -> extra_parameters[8]
    ); */
-static ALIGN_TYPE _txm_module_manager_tx_thread_create_dispatch(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE param_0, ALIGN_TYPE param_1, ALIGN_TYPE *extra_parameters)
+static ALIGN_TYPE _txm_module_manager_tx_thread_create_dispatch(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE param_0, ALIGN_TYPE param_1,
+                                                                ALIGN_TYPE *extra_parameters
+#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_THREAD_CREATE_PTR_CALL_NOT_USED) && !defined(TXM_THREAD_CREATE_CALL_NOT_USED)
+                                                                , UINT pointer_context
+#endif
+                                                                )
 {
 
+#ifndef TXM_THREAD_CREATE_CALL_NOT_USED
 ALIGN_TYPE return_value;
+#endif
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
@@ -2095,6 +2102,24 @@ ALIGN_TYPE return_value;
             return(TX_THRESH_ERROR);
     }
 
+#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_THREAD_CREATE_PTR_CALL_NOT_USED)
+#ifndef TXM_THREAD_CREATE_CALL_NOT_USED
+    if (pointer_context == TX_TRUE)
+#endif
+    {
+        /* The module library packs the original pointer types as dispatch words.
+           MISRA C:2023 Rules 11.1 and 11.6 apply to restoring those types.  */
+        return((ALIGN_TYPE) _txm_module_manager_thread_create_ptr(
+            (TX_THREAD *) param_0, (TX_NAME_CONST CHAR *) param_1,
+            module_instance -> txm_module_instance_shell_entry_function,
+            (VOID (*)(VOID *)) extra_parameters[0], (VOID *) extra_parameters[1],
+            (VOID *) extra_parameters[2], (ULONG) extra_parameters[3],
+            (UINT) extra_parameters[4], (UINT) extra_parameters[5], (ULONG) extra_parameters[6],
+            (UINT) extra_parameters[7], (UINT) extra_parameters[8], module_instance));
+    }
+#endif
+
+#ifndef TXM_THREAD_CREATE_CALL_NOT_USED
     return_value = (ALIGN_TYPE) _txm_module_manager_thread_create(
         (TX_THREAD *) param_0,
         (TX_NAME_CONST CHAR *) param_1,
@@ -2111,6 +2136,7 @@ ALIGN_TYPE return_value;
         module_instance
     );
     return(return_value);
+#endif
 }
 #endif
 
@@ -2896,7 +2922,7 @@ ALIGN_TYPE return_value;
 }
 #endif
 
-#ifndef TXM_TIMER_CREATE_CALL_NOT_USED
+#if !defined(TXM_TIMER_CREATE_CALL_NOT_USED) || (defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_TIMER_CREATE_PTR_CALL_NOT_USED))
 /* UINT _txe_timer_create(
     TX_TIMER *timer_ptr, -> param_0
     TX_NAME_CONST CHAR *name_ptr, -> param_1
@@ -2907,12 +2933,19 @@ ALIGN_TYPE return_value;
     UINT auto_activate, -> extra_parameters[4]
     UINT timer_control_block_size -> extra_parameters[5]
    ); */
-static ALIGN_TYPE _txm_module_manager_tx_timer_create_dispatch(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE param_0, ALIGN_TYPE param_1, ALIGN_TYPE *extra_parameters)
+static ALIGN_TYPE _txm_module_manager_tx_timer_create_dispatch(TXM_MODULE_INSTANCE *module_instance, ALIGN_TYPE param_0, ALIGN_TYPE param_1,
+                                                               ALIGN_TYPE *extra_parameters
+#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_TIMER_CREATE_PTR_CALL_NOT_USED) && !defined(TXM_TIMER_CREATE_CALL_NOT_USED)
+                                                               , UINT pointer_context
+#endif
+                                                               )
 {
 
+#ifndef TXM_TIMER_CREATE_CALL_NOT_USED
 ALIGN_TYPE return_value;
 TX_TIMER *timer_ptr;
 VOID (*expiration_function)(ULONG);
+#endif
 
     if (module_instance -> txm_module_instance_property_flags & TXM_MODULE_MEMORY_PROTECTION)
     {
@@ -2926,6 +2959,23 @@ VOID (*expiration_function)(ULONG);
             return(TXM_MODULE_INVALID_MEMORY);
     }
 
+#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_TIMER_CREATE_PTR_CALL_NOT_USED)
+#ifndef TXM_TIMER_CREATE_CALL_NOT_USED
+    if (pointer_context == TX_TRUE)
+#endif
+    {
+        /* Restore the pointer types from the module dispatch words.
+           MISRA C:2023 Rules 11.1 and 11.6 apply to those casts.  */
+        return((ALIGN_TYPE) _txe_timer_create_ptr_dispatch(
+            (TX_TIMER *) param_0, (TX_NAME_CONST CHAR *) param_1,
+            (VOID (*)(VOID *)) extra_parameters[0], (VOID *) extra_parameters[1],
+            _txm_module_manager_timer_notify_pointer, module_instance,
+            (ULONG) extra_parameters[2], (ULONG) extra_parameters[3],
+            (UINT) extra_parameters[4], (UINT) extra_parameters[5]));
+    }
+#endif
+
+#ifndef TXM_TIMER_CREATE_CALL_NOT_USED
     /* Is it a disable request?  */
     if ((void *) extra_parameters[0] == TX_NULL)
     {
@@ -2966,6 +3016,7 @@ VOID (*expiration_function)(ULONG);
         }
     }
     return(return_value);
+#endif
 }
 #endif
 
