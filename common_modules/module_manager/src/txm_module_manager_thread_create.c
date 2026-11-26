@@ -84,12 +84,22 @@
 /*    _txm_module_manager_kernel_dispatch   Kernel dispatch function      */
 /*                                                                        */
 /**************************************************************************/
+#ifdef TX_ENABLE_POINTER_CONTEXT
+static UINT  _txm_module_manager_thread_create_initial(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
+                            VOID (*shell_function)(TX_THREAD *, TXM_MODULE_INSTANCE *),
+                            VOID (*entry_function)(ULONG id), ULONG entry_input,
+                            VOID (*entry_function_ptr)(VOID *), VOID *entry_input_ptr,
+                            VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
+                            ULONG time_slice, UINT auto_start,
+                            UINT thread_control_block_size, TXM_MODULE_INSTANCE *module_instance)
+#else
 UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
                             VOID (*shell_function)(TX_THREAD *, TXM_MODULE_INSTANCE *),
                             VOID (*entry_function)(ULONG id), ULONG entry_input,
                             VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
                             ULONG time_slice, UINT auto_start,
                             UINT thread_control_block_size, TXM_MODULE_INSTANCE *module_instance)
+#endif
 {
 
 TX_INTERRUPT_SAVE_AREA
@@ -193,7 +203,11 @@ ULONG                   i;
     }
 
     /* Check for invalid thread entry point.  */
+#ifdef TX_ENABLE_POINTER_CONTEXT
+    if ((entry_function == TX_NULL) && (entry_function_ptr == TX_NULL))
+#else
     if (entry_function == TX_NULL)
+#endif
     {
 
         /* Invalid stack or entry point, return appropriate error code.  */
@@ -372,6 +386,10 @@ ULONG                   i;
     thread_ptr -> tx_thread_name =                name_ptr;
     thread_ptr -> tx_thread_entry =               entry_function;
     thread_ptr -> tx_thread_entry_parameter =     entry_input;
+#ifdef TX_ENABLE_POINTER_CONTEXT
+    thread_ptr -> tx_thread_entry_ptr =           entry_function_ptr;
+    thread_ptr -> tx_thread_entry_parameter_ptr = entry_input_ptr;
+#endif
     thread_ptr -> tx_thread_stack_start =         stack_start;
     thread_ptr -> tx_thread_stack_size =          stack_size;
     thread_ptr -> tx_thread_priority =            priority;
@@ -457,6 +475,10 @@ ULONG                   i;
     thread_entry_info -> txm_module_thread_entry_info_code_base_address =        module_instance -> txm_module_instance_code_start;
     thread_entry_info -> txm_module_thread_entry_info_entry =                    thread_ptr -> tx_thread_entry;
     thread_entry_info -> txm_module_thread_entry_info_parameter =                thread_ptr -> tx_thread_entry_parameter;
+#ifdef TX_ENABLE_POINTER_CONTEXT
+    thread_entry_info -> txm_module_thread_entry_info_entry_ptr =               thread_ptr -> tx_thread_entry_ptr;
+    thread_entry_info -> txm_module_thread_entry_info_parameter_ptr =           thread_ptr -> tx_thread_entry_parameter_ptr;
+#endif
     thread_entry_info -> txm_module_thread_entry_info_callback_request_queue =   &(module_instance -> txm_module_instance_callback_request_queue);
     thread_entry_info -> txm_module_thread_entry_info_callback_request_thread =  &(module_instance -> txm_module_instance_callback_request_thread);
 
@@ -768,3 +790,33 @@ ULONG                   i;
     /* Return success.  */
     return(TX_SUCCESS);
 }
+
+#ifdef TX_ENABLE_POINTER_CONTEXT
+/* Create a module thread that receives an ULONG entry argument.  */
+UINT  _txm_module_manager_thread_create(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
+                            VOID (*shell_function)(TX_THREAD *, TXM_MODULE_INSTANCE *),
+                            VOID (*entry_function)(ULONG id), ULONG entry_input,
+                            VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
+                            ULONG time_slice, UINT auto_start,
+                            UINT thread_control_block_size, TXM_MODULE_INSTANCE *module_instance)
+{
+    return(_txm_module_manager_thread_create_initial(thread_ptr, name_ptr, shell_function,
+                            entry_function, entry_input, TX_NULL, TX_NULL,
+                            stack_start, stack_size, priority, preempt_threshold,
+                            time_slice, auto_start, thread_control_block_size, module_instance));
+}
+
+/* Create a module thread that receives a pointer entry argument.  */
+UINT  _txm_module_manager_thread_create_ptr(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr,
+                            VOID (*shell_function)(TX_THREAD *, TXM_MODULE_INSTANCE *),
+                            VOID (*entry_function)(VOID *id), VOID *entry_input,
+                            VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold,
+                            ULONG time_slice, UINT auto_start,
+                            UINT thread_control_block_size, TXM_MODULE_INSTANCE *module_instance)
+{
+    return(_txm_module_manager_thread_create_initial(thread_ptr, name_ptr, shell_function,
+                            TX_NULL, 0UL, entry_function, entry_input,
+                            stack_start, stack_size, priority, preempt_threshold,
+                            time_slice, auto_start, thread_control_block_size, module_instance));
+}
+#endif

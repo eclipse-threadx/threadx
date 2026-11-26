@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -524,7 +525,24 @@ TXM_MODULE_INSTANCE *module_instance;
     #ifndef TXM_THREAD_CREATE_CALL_NOT_USED
     case TXM_THREAD_CREATE_CALL:
     {
-        return_value = _txm_module_manager_tx_thread_create_dispatch(module_instance, param_0, param_1, (ALIGN_TYPE *) param_2);
+        return_value = _txm_module_manager_tx_thread_create_dispatch(module_instance, param_0, param_1, (ALIGN_TYPE *) param_2
+    #if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_THREAD_CREATE_PTR_CALL_NOT_USED)
+                                                                     , TX_FALSE
+    #endif
+                                                                     );
+        break;
+    }
+    #endif
+
+    #if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_THREAD_CREATE_PTR_CALL_NOT_USED)
+    case TXM_THREAD_CREATE_PTR_CALL:
+    {
+        return_value = _txm_module_manager_tx_thread_create_dispatch(module_instance, param_0, param_1,
+                                                                     (ALIGN_TYPE *) param_2
+    #ifndef TXM_THREAD_CREATE_CALL_NOT_USED
+                                                                     , TX_TRUE
+    #endif
+                                                                     );
         break;
     }
     #endif
@@ -716,7 +734,25 @@ TXM_MODULE_INSTANCE *module_instance;
     #ifndef TXM_TIMER_CREATE_CALL_NOT_USED
     case TXM_TIMER_CREATE_CALL:
     {
-        return_value = _txm_module_manager_tx_timer_create_dispatch(module_instance, param_0, param_1, (ALIGN_TYPE *) param_2);
+        return_value = _txm_module_manager_tx_timer_create_dispatch(module_instance, param_0, param_1,
+                                                                   (ALIGN_TYPE *) param_2
+    #if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_TIMER_CREATE_PTR_CALL_NOT_USED)
+                                                                   , TX_FALSE
+    #endif
+                                                                   );
+        break;
+    }
+    #endif
+
+    #if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_TIMER_CREATE_PTR_CALL_NOT_USED)
+    case TXM_TIMER_CREATE_PTR_CALL:
+    {
+        return_value = _txm_module_manager_tx_timer_create_dispatch(module_instance, param_0, param_1,
+                                                                   (ALIGN_TYPE *) param_2
+    #ifndef TXM_TIMER_CREATE_CALL_NOT_USED
+                                                                   , TX_TRUE
+    #endif
+                                                                   );
         break;
     }
     #endif

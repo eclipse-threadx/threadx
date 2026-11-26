@@ -39,6 +39,52 @@ extern UCHAR                    module_services_protected[];
 
 static TXM_MODULE_INSTANCE      test_module;
 
+#ifdef TX_ENABLE_POINTER_CONTEXT
+/* Timer messages with different callback types must remain separate.  */
+static VOID  check_timer_message_types(VOID)
+{
+TX_QUEUE queue;
+TXM_MODULE_CALLBACK_MESSAGE message = {0};
+ULONG storage[3U * (sizeof(TXM_MODULE_CALLBACK_MESSAGE) / sizeof(ULONG))];
+UINT status;
+
+    status = tx_queue_create(&queue, "test callback queue",
+                             sizeof(TXM_MODULE_CALLBACK_MESSAGE) / sizeof(ULONG),
+                             storage, sizeof(storage));
+    harness_expect("test callback queue created", status, TX_SUCCESS);
+    if (status != TX_SUCCESS)
+    {
+        return;
+    }
+
+    message.txm_module_callback_message_type = TXM_TIMER_CALLBACK;
+    message.txm_module_callback_message_activation_count = 1;
+    _txm_module_manager_callback_request(&queue, &message);
+
+    message.txm_module_callback_message_type = TXM_TIMER_CALLBACK_PTR;
+    _txm_module_manager_callback_request(&queue, &message);
+    _txm_module_manager_callback_request(&queue, &message);
+
+    harness_expect("received scalar timer message", tx_queue_receive(&queue, &message, TX_NO_WAIT), TX_SUCCESS);
+    harness_expect("scalar timer message type", message.txm_module_callback_message_type, TXM_TIMER_CALLBACK);
+    harness_expect("scalar timer message count", message.txm_module_callback_message_activation_count, 1UL);
+    harness_expect("received pointer timer message", tx_queue_receive(&queue, &message, TX_NO_WAIT), TX_SUCCESS);
+    harness_expect("pointer timer message type", message.txm_module_callback_message_type, TXM_TIMER_CALLBACK_PTR);
+    harness_expect("pointer timer message count", message.txm_module_callback_message_activation_count, 2UL);
+    harness_expect("test callback queue deleted", tx_queue_delete(&queue), TX_SUCCESS);
+}
+
+/* A snapshotted expiration cannot be delivered after stop or unload.  */
+static VOID  check_inactive_timer_notification(TXM_MODULE_INSTANCE *module_instance)
+{
+ULONG errors_before = _txm_module_manager_callback_error_count;
+
+    _txm_module_manager_timer_notify_pointer(module_instance, TX_NULL, TX_NULL);
+    harness_expect("inactive module rejected timer notification",
+                   _txm_module_manager_callback_error_count, errors_before + 1UL);
+}
+#endif
+
 
 VOID  harness_test(VOID)
 {
@@ -46,6 +92,10 @@ ULONG   cycle;
 ULONG   available_before;
 
     harness_print("Module lifecycle: protected module, load/start/stop/unload twice\n");
+
+#ifdef TX_ENABLE_POINTER_CONTEXT
+    check_timer_message_types();
+#endif
 
     available_before = harness_module_pool_available();
 
@@ -70,7 +120,13 @@ ULONG   available_before;
         harness_expect("no memory fault", harness_fault_count, 0UL);
 
         harness_expect("module stop", (ULONG) txm_module_manager_stop(&test_module), (ULONG) TX_SUCCESS);
+#ifdef TX_ENABLE_POINTER_CONTEXT
+        check_inactive_timer_notification(&test_module);
+#endif
         harness_expect("module unload", (ULONG) txm_module_manager_unload(&test_module), (ULONG) TX_SUCCESS);
+#ifdef TX_ENABLE_POINTER_CONTEXT
+        check_inactive_timer_notification(&test_module);
+#endif
         harness_expect("module memory returned", harness_module_pool_available(), available_before);
     }
 }

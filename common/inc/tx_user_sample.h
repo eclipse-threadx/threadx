@@ -198,8 +198,8 @@
 */
 
 /* Enable tx_thread_create_ptr and tx_timer_create_ptr with VOID * contexts.
-   Use the same setting when building ThreadX and its applications, since
-   this option adds callback storage to TX_THREAD and TX_TIMER.  */
+   Use the same setting for the kernel, applications, Module Manager, module
+   library, and loadable modules. It changes the TX_THREAD and TX_TIMER sizes.  */
 
 /*
 #define TX_ENABLE_POINTER_CONTEXT

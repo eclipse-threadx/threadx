@@ -85,6 +85,8 @@ ULONG                       timeout_param =  ((ULONG) 0);
 VOID                        (*timeout_function_ptr)(VOID *id);
 VOID                        *timeout_param_ptr =  TX_NULL;
 TX_TIMER                    *pointer_timer;
+TX_TIMER_POINTER_DISPATCH   timeout_dispatch = TX_NULL;
+VOID                        *timeout_owner = TX_NULL;
 #endif
 TX_THREAD                   *thread_ptr;
 #ifdef TX_REACTIVATE_INLINE
@@ -317,6 +319,8 @@ UINT                         status;
                         TX_USER_TIMER_POINTER_GET(current_timer, pointer_timer)
                         timeout_function_ptr =  pointer_timer -> tx_timer_timeout_function_ptr;
                         timeout_param_ptr =     pointer_timer -> tx_timer_timeout_param_ptr;
+                        timeout_dispatch =      pointer_timer -> tx_timer_timeout_dispatch;
+                        timeout_owner =         pointer_timer -> tx_timer_timeout_owner;
                     }
 #endif
 
@@ -360,7 +364,14 @@ UINT                         status;
                 if (timeout_function_ptr != TX_NULL)
                 {
 
-                    (timeout_function_ptr) (timeout_param_ptr);
+                    if (timeout_dispatch != TX_NULL)
+                    {
+                        (timeout_dispatch)(timeout_owner, timeout_function_ptr, timeout_param_ptr);
+                    }
+                    else
+                    {
+                        (timeout_function_ptr)(timeout_param_ptr);
+                    }
                 }
                 else
 #endif

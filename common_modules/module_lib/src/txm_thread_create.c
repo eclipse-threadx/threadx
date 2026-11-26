@@ -95,3 +95,30 @@ ALIGN_TYPE extra_parameters[9];
     return(return_value);
 }
 #endif
+
+#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_THREAD_CREATE_PTR_CALL_NOT_USED)
+/* Pack the typed entry and context for the Module Manager. MISRA C:2023
+   Rules 11.1 and 11.6 apply to the address-sized dispatch arguments.  */
+UINT _txe_thread_create_ptr(TX_THREAD *thread_ptr, TX_NAME_CONST CHAR *name_ptr, VOID (*entry_function)(VOID *id), VOID *entry_input, VOID *stack_start, ULONG stack_size, UINT priority, UINT preempt_threshold, ULONG time_slice, UINT auto_start, UINT thread_control_block_size)
+{
+
+UINT return_value;
+ALIGN_TYPE extra_parameters[9];
+
+    extra_parameters[0] = (ALIGN_TYPE) entry_function;
+    extra_parameters[1] = (ALIGN_TYPE) entry_input;
+    extra_parameters[2] = (ALIGN_TYPE) stack_start;
+    extra_parameters[3] = (ALIGN_TYPE) stack_size;
+    extra_parameters[4] = (ALIGN_TYPE) priority;
+    extra_parameters[5] = (ALIGN_TYPE) preempt_threshold;
+    extra_parameters[6] = (ALIGN_TYPE) time_slice;
+    extra_parameters[7] = (ALIGN_TYPE) auto_start;
+    extra_parameters[8] = (ALIGN_TYPE) thread_control_block_size;
+
+    /* Call module manager dispatcher.  */
+    return_value = (UINT) (_txm_module_kernel_call_dispatcher)(TXM_THREAD_CREATE_PTR_CALL, (ALIGN_TYPE) thread_ptr, (ALIGN_TYPE) name_ptr, (ALIGN_TYPE) extra_parameters);
+
+    /* Return value to the caller.  */
+    return(return_value);
+}
+#endif

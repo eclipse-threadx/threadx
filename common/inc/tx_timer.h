@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -203,5 +204,17 @@ TIMER_DECLARE  ULONG            _tx_timer_performance__expiration_adjust_count;
 #define TX_TIMER_DELETE_PORT_COMPLETION(t)
 #endif
 
+
+#ifdef TX_ENABLE_POINTER_CONTEXT
+UINT  _tx_timer_create_ptr_dispatch(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
+                            VOID (*expiration_function)(VOID *), VOID *expiration_input,
+                            TX_TIMER_POINTER_DISPATCH dispatch, VOID *owner,
+                            ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate);
+UINT  _txe_timer_create_ptr_dispatch(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
+                            VOID (*expiration_function)(VOID *), VOID *expiration_input,
+                            TX_TIMER_POINTER_DISPATCH dispatch, VOID *owner,
+                            ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate,
+                            UINT timer_control_block_size);
+#endif
 
 #endif

@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 #include   <stdio.h>
 #include   <stdlib.h>
@@ -30,6 +31,8 @@ static TX_THREAD       thread_ulong_test;
 
 static TX_TIMER        timer_ptr_test;
 static TX_TIMER        timer_ulong_test;
+static TX_TIMER        timer_silent_test;
+static TX_TIMER        timer_dispatched_test;
 
 static void           *received_thread_ptr_ctx = TX_NULL;
 static void           *received_timer_ptr_ctx = TX_NULL;
@@ -40,6 +43,7 @@ static volatile UINT   thread_ptr_executed = 0;
 static volatile UINT   thread_ulong_executed = 0;
 static volatile UINT   timer_ptr_executed = 0;
 static volatile UINT   timer_ulong_executed = 0;
+static volatile UINT   timer_dispatched = 0;
 
 #if (defined(__x86_64__) || defined(_WIN64) || defined(__aarch64__) || (defined(__riscv_xlen) && (__riscv_xlen == 64)) || defined(__LP64__) || defined(_LP64))
 #define TEST_PTR_VAL_1    ((VOID *)(ALIGN_TYPE) 0x123456789ABCDEF0ULL)
@@ -74,13 +78,23 @@ static void thread_ulong_entry(ULONG entry_input)
 static void timer_ptr_expiration(VOID *expiration_input)
 {
     received_timer_ptr_ctx = expiration_input;
-    timer_ptr_executed = 1;
+    timer_ptr_executed++;
 }
 
 static void timer_ulong_expiration(ULONG expiration_input)
 {
     received_timer_ulong_ctx = expiration_input;
-    timer_ulong_executed = 1;
+    timer_ulong_executed++;
+}
+
+/* Verify the owner and callback delivered to the timer dispatcher.  */
+static void timer_dispatch(VOID *owner, VOID (*callback)(VOID *), VOID *context)
+{
+    if ((owner == &timer_dispatched_test) && (callback == timer_ptr_expiration) &&
+        (context == TEST_PTR_VAL_2))
+    {
+        timer_dispatched++;
+    }
 }
 
 static void thread_0_entry(ULONG thread_input)
@@ -199,6 +213,36 @@ static void thread_0_entry(ULONG thread_input)
         error++;
     }
 #endif
+
+    /* Defer the first pointer callback for a full wheel turn, then reload all timers.  */
+    status = tx_timer_change(&timer_ptr_test, TX_TIMER_ENTRIES + 1, 2);
+    status |= tx_timer_change(&timer_ulong_test, 1, 2);
+    status |= tx_timer_create_ptr(&timer_silent_test, "silent timer", TX_NULL, TX_NULL,
+                                  1, 2, TX_AUTO_ACTIVATE);
+    status |= _txe_timer_create_ptr_dispatch(&timer_dispatched_test, "dispatched timer",
+                                            timer_ptr_expiration, expected_timer_ptr, timer_dispatch,
+                                            &timer_dispatched_test, 1, 0, TX_AUTO_ACTIVATE,
+                                            sizeof(TX_TIMER));
+    status |= tx_timer_activate(&timer_ptr_test);
+    status |= tx_timer_activate(&timer_ulong_test);
+    if (status != TX_SUCCESS)
+    {
+        error++;
+    }
+
+    tx_thread_sleep(5);
+    if ((timer_ptr_executed != 1) || (timer_ulong_executed < 2) || (timer_dispatched != 1))
+    {
+        error++;
+    }
+
+    tx_thread_sleep(TX_TIMER_ENTRIES + 4);
+    if ((timer_ptr_executed < 3) || (received_timer_ptr_ctx != expected_timer_ptr))
+    {
+        error++;
+    }
+    tx_timer_delete(&timer_silent_test);
+    tx_timer_delete(&timer_dispatched_test);
 
     /* Clean up created objects.  */
     tx_timer_deactivate(&timer_ptr_test);

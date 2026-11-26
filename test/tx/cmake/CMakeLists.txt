@@ -25,9 +25,6 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
 option(TX_ENABLE_POINTER_CONTEXT "Exercise the pointer context APIs" OFF)
-if(TX_ENABLE_POINTER_CONTEXT)
-  add_compile_definitions(TX_ENABLE_POINTER_CONTEXT)
-endif()
 
 # Set build configurations
 set(BUILD_CONFIGURATIONS default_build_coverage disable_notify_callbacks_build
@@ -97,6 +94,9 @@ endif()
 enable_testing()
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../.. threadx)
+if(TX_ENABLE_POINTER_CONTEXT)
+  target_compile_definitions(threadx PUBLIC TX_ENABLE_POINTER_CONTEXT)
+endif()
 add_subdirectory(regression)
 add_subdirectory(samples)
 

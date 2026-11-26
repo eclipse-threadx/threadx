@@ -372,6 +372,12 @@ typedef struct TX_TIMER_INTERNAL_STRUCT
 #endif
 
 
+#ifdef TX_ENABLE_POINTER_CONTEXT
+/* Deliver a snapshotted pointer callback through the object's owner.  */
+typedef VOID (*TX_TIMER_POINTER_DISPATCH)(VOID *owner, VOID (*callback)(VOID *), VOID *input);
+#endif
+
+
 /* Define the timer structure utilized by the application.  */
 
 typedef struct TX_TIMER_STRUCT
@@ -417,6 +423,8 @@ typedef struct TX_TIMER_STRUCT
     /* Pointer callback storage follows the port and user fields. */
     VOID                (*tx_timer_timeout_function_ptr)(VOID *input);
     VOID                *tx_timer_timeout_param_ptr;
+    TX_TIMER_POINTER_DISPATCH tx_timer_timeout_dispatch;
+    VOID                *tx_timer_timeout_owner;
 #endif
 
 } TX_TIMER;
@@ -1152,8 +1160,12 @@ UINT    _tx_trace_interrupt_control(UINT new_posture);
 #define tx_semaphore_put                            _tx_semaphore_put
 #define tx_semaphore_put_notify                     _tx_semaphore_put_notify
 
-#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_MODULE)
+#ifdef TX_ENABLE_POINTER_CONTEXT
+#ifdef TXM_MODULE
+#define tx_thread_create_ptr(t,n,e,i,s,l,p,r,c,a)   _txe_thread_create_ptr((t),(n),(e),(i),(s),(l),(p),(r),(c),(a),(sizeof(TX_THREAD)))
+#else
 #define tx_thread_create_ptr                        _tx_thread_create_ptr
+#endif
 #endif
 #define tx_thread_create                            _tx_thread_create
 #define tx_thread_delete                            _tx_thread_delete
@@ -1178,8 +1190,12 @@ UINT    _tx_trace_interrupt_control(UINT new_posture);
 #define tx_time_set                                 _tx_time_set
 #define tx_timer_activate                           _tx_timer_activate
 #define tx_timer_change                             _tx_timer_change
-#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_MODULE)
+#ifdef TX_ENABLE_POINTER_CONTEXT
+#ifdef TXM_MODULE
+#define tx_timer_create_ptr(t,n,e,i,c,r,a)          _txe_timer_create_ptr((t),(n),(e),(i),(c),(r),(a),(sizeof(TX_TIMER)))
+#else
 #define tx_timer_create_ptr                         _tx_timer_create_ptr
+#endif
 #endif
 #define tx_timer_create                             _tx_timer_create
 #define tx_timer_deactivate                         _tx_timer_deactivate
@@ -1281,7 +1297,7 @@ UINT    _tx_trace_interrupt_control(UINT new_posture);
 #define tx_semaphore_put                            _txr_semaphore_put
 #define tx_semaphore_put_notify                     _txr_semaphore_put_notify
 
-#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_MODULE)
+#ifdef TX_ENABLE_POINTER_CONTEXT
 #define tx_thread_create_ptr(t,n,e,i,s,l,p,r,c,a)   _txe_thread_create_ptr((t),(n),(e),(i),(s),(l),(p),(r),(c),(a),(sizeof(TX_THREAD)))
 #endif
 #define tx_thread_create(t,n,e,i,s,l,p,r,c,a)       _txr_thread_create((t),(n),(e),(i),(s),(l),(p),(r),(c),(a),(sizeof(TX_THREAD)))
@@ -1307,7 +1323,7 @@ UINT    _tx_trace_interrupt_control(UINT new_posture);
 #define tx_time_set                                 _tx_time_set
 #define tx_timer_activate                           _txr_timer_activate
 #define tx_timer_change                             _txr_timer_change
-#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_MODULE)
+#ifdef TX_ENABLE_POINTER_CONTEXT
 #define tx_timer_create_ptr(t,n,e,i,c,r,a)          _txe_timer_create_ptr((t),(n),(e),(i),(c),(r),(a),(sizeof(TX_TIMER)))
 #endif
 #define tx_timer_create(t,n,e,i,c,r,a)              _txr_timer_create((t),(n),(e),(i),(c),(r),(a),(sizeof(TX_TIMER)))
@@ -1398,7 +1414,7 @@ UINT    _tx_el_interrupt_control(UINT new_posture);
 #define tx_semaphore_put                            _txe_semaphore_put
 #define tx_semaphore_put_notify                     _txe_semaphore_put_notify
 
-#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_MODULE)
+#ifdef TX_ENABLE_POINTER_CONTEXT
 #define tx_thread_create_ptr(t,n,e,i,s,l,p,r,c,a)   _txe_thread_create_ptr((t),(n),(e),(i),(s),(l),(p),(r),(c),(a),(sizeof(TX_THREAD)))
 #endif
 #define tx_thread_create(t,n,e,i,s,l,p,r,c,a)       _txe_thread_create((t),(n),(e),(i),(s),(l),(p),(r),(c),(a),(sizeof(TX_THREAD)))
@@ -1424,7 +1440,7 @@ UINT    _tx_el_interrupt_control(UINT new_posture);
 #define tx_time_set                                 _tx_time_set
 #define tx_timer_activate                           _txe_timer_activate
 #define tx_timer_change                             _txe_timer_change
-#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_MODULE)
+#ifdef TX_ENABLE_POINTER_CONTEXT
 #define tx_timer_create_ptr(t,n,e,i,c,r,a)          _txe_timer_create_ptr((t),(n),(e),(i),(c),(r),(a),(sizeof(TX_TIMER)))
 #endif
 #define tx_timer_create(t,n,e,i,c,r,a)              _txe_timer_create((t),(n),(e),(i),(c),(r),(a),(sizeof(TX_TIMER)))

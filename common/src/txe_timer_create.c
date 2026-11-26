@@ -79,12 +79,14 @@
 static UINT  _txe_timer_create_initial(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
                                        VOID (*expiration_function)(ULONG id), ULONG expiration_input,
                                        VOID (*expiration_function_ptr)(VOID *id), VOID *expiration_input_ptr,
+                                       TX_TIMER_POINTER_DISPATCH dispatch, VOID *owner,
                                        ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate, UINT timer_control_block_size);
 
 /**************************************************************************/
 static UINT  _txe_timer_create_initial(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
                                        VOID (*expiration_function)(ULONG id), ULONG expiration_input,
                                        VOID (*expiration_function_ptr)(VOID *id), VOID *expiration_input_ptr,
+                                       TX_TIMER_POINTER_DISPATCH dispatch, VOID *owner,
                                        ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate, UINT timer_control_block_size)
 #else
 UINT  _txe_timer_create(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
@@ -238,8 +240,8 @@ TX_THREAD       *thread_ptr;
 #ifdef TX_ENABLE_POINTER_CONTEXT
         if (expiration_function_ptr != TX_NULL)
         {
-            status =  _tx_timer_create_ptr(timer_ptr, name_ptr,
-                                           expiration_function_ptr, expiration_input_ptr,
+            status =  _tx_timer_create_ptr_dispatch(timer_ptr, name_ptr,
+                                           expiration_function_ptr, expiration_input_ptr, dispatch, owner,
                                            initial_ticks, reschedule_ticks, auto_activate);
         }
         else
@@ -298,7 +300,7 @@ UINT  _txe_timer_create(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
 {
     return(_txe_timer_create_initial(timer_ptr, name_ptr,
                                      expiration_function, expiration_input,
-                                     TX_NULL, TX_NULL,
+                                     TX_NULL, TX_NULL, TX_NULL, TX_NULL,
                                      initial_ticks, reschedule_ticks, auto_activate,
                                      timer_control_block_size));
 }
@@ -344,8 +346,21 @@ UINT  _txe_timer_create_ptr(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
 {
     return(_txe_timer_create_initial(timer_ptr, name_ptr,
                                      TX_NULL, 0,
-                                     expiration_function, expiration_input,
+                                     expiration_function, expiration_input, TX_NULL, TX_NULL,
                                      initial_ticks, reschedule_ticks, auto_activate,
                                      timer_control_block_size));
+}
+
+/* Validate a pointer timer request and carry its callback to the owner's dispatcher.  */
+UINT  _txe_timer_create_ptr_dispatch(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
+                            VOID (*expiration_function)(VOID *), VOID *expiration_input,
+                            TX_TIMER_POINTER_DISPATCH dispatch, VOID *owner,
+                            ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate,
+                            UINT timer_control_block_size)
+{
+    return(_txe_timer_create_initial(timer_ptr, name_ptr, TX_NULL, 0UL,
+                                      expiration_function, expiration_input, dispatch, owner,
+                                      initial_ticks, reschedule_ticks, auto_activate,
+                                      timer_control_block_size));
 }
 #endif /* TX_ENABLE_POINTER_CONTEXT */

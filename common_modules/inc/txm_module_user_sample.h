@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -108,6 +109,7 @@
 /* #define TXM_SEMAPHORE_PUT_CALL_NOT_USED */
 /* #define TXM_SEMAPHORE_PUT_NOTIFY_CALL_NOT_USED */
 /* #define TXM_THREAD_CREATE_CALL_NOT_USED */
+/* #define TXM_THREAD_CREATE_PTR_CALL_NOT_USED */
 /* #define TXM_THREAD_DELETE_CALL_NOT_USED */
 /* #define TXM_THREAD_ENTRY_EXIT_NOTIFY_CALL_NOT_USED */
 /* #define TXM_THREAD_IDENTIFY_CALL_NOT_USED */
@@ -132,6 +134,7 @@
 /* #define TXM_TIMER_ACTIVATE_CALL_NOT_USED */
 /* #define TXM_TIMER_CHANGE_CALL_NOT_USED */
 /* #define TXM_TIMER_CREATE_CALL_NOT_USED */
+/* #define TXM_TIMER_CREATE_PTR_CALL_NOT_USED */
 /* #define TXM_TIMER_DEACTIVATE_CALL_NOT_USED */
 /* #define TXM_TIMER_DELETE_CALL_NOT_USED */
 /* #define TXM_TIMER_INFO_GET_CALL_NOT_USED */

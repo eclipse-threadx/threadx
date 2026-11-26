@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -143,7 +144,7 @@ VOID            (*entry_exit_notify)(TX_THREAD *notify_thread_ptr, UINT type);
 #endif
 
     /* Call current thread's entry function.  */
-    (thread_info -> txm_module_thread_entry_info_entry) (thread_info -> txm_module_thread_entry_info_parameter);
+    TXM_MODULE_THREAD_ENTRY_CALL(thread_info);
 
     /* Suspend thread with a "completed" state.  */
 

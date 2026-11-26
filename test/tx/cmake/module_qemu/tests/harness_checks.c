@@ -38,6 +38,12 @@ VOID  harness_check_services(ULONG cycle)
     harness_expect("module semaphore get", MODULE_SHARED[MODULE_OUT_SEMAPHORE_STATUS], (ULONG) TX_SUCCESS);
     harness_expect("module sleep lasted its ticks",
                    (ULONG) (MODULE_SHARED[MODULE_OUT_SLEEP_TICKS] >= EXPECTED_SLEEP_TICKS), (ULONG) TX_TRUE);
+#ifdef TX_ENABLE_POINTER_CONTEXT
+    harness_expect("module pointer services status", MODULE_SHARED[MODULE_OUT_POINTER_STATUS], TX_SUCCESS);
+    harness_expect("module pointer thread ran before and after reset", MODULE_SHARED[MODULE_OUT_POINTER_THREADS], 2UL);
+    harness_expect("module pointer timer callback", MODULE_SHARED[MODULE_OUT_POINTER_TIMERS], 1UL);
+    harness_expect("module legacy timer callback", MODULE_SHARED[MODULE_OUT_LEGACY_TIMERS], 1UL);
+#endif
 }
 
 

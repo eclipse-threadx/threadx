@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -132,4 +133,40 @@ CHAR                        *internal_ptr;
         TX_RESTORE
     }
 }
+
+#if defined(TX_ENABLE_POINTER_CONTEXT) && !defined(TXM_TIMER_CREATE_PTR_CALL_NOT_USED)
+/* Queue a pointer timer expiration using the callback captured at expiration.  */
+VOID  _txm_module_manager_timer_notify_pointer(VOID *owner, VOID (*callback)(VOID *), VOID *id)
+{
+TX_INTERRUPT_SAVE_AREA
+
+TXM_MODULE_INSTANCE         *module_instance = owner;
+TXM_MODULE_CALLBACK_MESSAGE  callback_message = {0};
+
+    TX_DISABLE
+
+    if ((module_instance -> txm_module_instance_id == TXM_MODULE_ID) &&
+        (module_instance -> txm_module_instance_state == TXM_MODULE_STARTED))
+    {
+        callback_message.txm_module_callback_message_type = TXM_TIMER_CALLBACK_PTR;
+        callback_message.txm_module_callback_message_activation_count = 1;
+
+        /* The queue ABI stores a generic callback and pointer-width words.
+           MISRA C:2023 Rules 11.1 and 11.6 apply to these conversions.  */
+        callback_message.txm_module_callback_message_application_function = (VOID (*)(VOID)) callback;
+        callback_message.txm_module_callback_message_param_1 = (ALIGN_TYPE) id;
+
+        TX_RESTORE
+
+        _txm_module_manager_callback_request(&(module_instance -> txm_module_instance_callback_request_queue),
+                                             &callback_message);
+    }
+    else
+    {
+        _txm_module_manager_callback_error_count++;
+
+        TX_RESTORE
+    }
+}
+#endif
 

@@ -73,12 +73,14 @@
 static UINT  _tx_timer_create_initial(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
                                       VOID (*expiration_function)(ULONG id), ULONG expiration_input,
                                       VOID (*expiration_function_ptr)(VOID *id), VOID *expiration_input_ptr,
+                                      TX_TIMER_POINTER_DISPATCH dispatch, VOID *owner,
                                       ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate);
 
 /**************************************************************************/
 static UINT  _tx_timer_create_initial(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
                                       VOID (*expiration_function)(ULONG id), ULONG expiration_input,
                                       VOID (*expiration_function_ptr)(VOID *id), VOID *expiration_input_ptr,
+                                      TX_TIMER_POINTER_DISPATCH dispatch, VOID *owner,
                                       ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate)
 #else
 UINT  _tx_timer_create(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
@@ -105,6 +107,8 @@ TX_TIMER        *previous_timer;
 #ifdef TX_ENABLE_POINTER_CONTEXT
     timer_ptr -> tx_timer_timeout_function_ptr =                         expiration_function_ptr;
     timer_ptr -> tx_timer_timeout_param_ptr =                            expiration_input_ptr;
+    timer_ptr -> tx_timer_timeout_dispatch =                             dispatch;
+    timer_ptr -> tx_timer_timeout_owner =                                owner;
 #endif
 
 #ifdef TX_THREAD_SMP_ONLY_CORE_0_DEFAULT
@@ -222,7 +226,7 @@ UINT  _tx_timer_create(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
 {
     return(_tx_timer_create_initial(timer_ptr, name_ptr,
                                     expiration_function, expiration_input,
-                                    TX_NULL, TX_NULL,
+                                    TX_NULL, TX_NULL, TX_NULL, TX_NULL,
                                     initial_ticks, reschedule_ticks, auto_activate));
 }
 
@@ -262,7 +266,18 @@ UINT  _tx_timer_create_ptr(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
 {
     return(_tx_timer_create_initial(timer_ptr, name_ptr,
                                     TX_NULL, 0,
-                                    expiration_function, expiration_input,
+                                    expiration_function, expiration_input, TX_NULL, TX_NULL,
+                                    initial_ticks, reschedule_ticks, auto_activate));
+}
+
+/* Create a pointer timer with owner-specific callback delivery.  */
+UINT  _tx_timer_create_ptr_dispatch(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR *name_ptr,
+                            VOID (*expiration_function)(VOID *), VOID *expiration_input,
+                            TX_TIMER_POINTER_DISPATCH dispatch, VOID *owner,
+                            ULONG initial_ticks, ULONG reschedule_ticks, UINT auto_activate)
+{
+    return(_tx_timer_create_initial(timer_ptr, name_ptr, TX_NULL, 0UL,
+                                    expiration_function, expiration_input, dispatch, owner,
                                     initial_ticks, reschedule_ticks, auto_activate));
 }
 #endif /* TX_ENABLE_POINTER_CONTEXT */
