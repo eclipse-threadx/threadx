@@ -15,12 +15,7 @@
 
 #include   <stdio.h>
 #include   "tx_api.h"
-
-
-/* Prototype for direct call.  */
-
-VOID        _tx_thread_stack_analyze(TX_THREAD *thread_ptr);
-
+#include   "tx_thread.h"
 
 
 static unsigned long   thread_0_counter =  0;
@@ -147,6 +142,27 @@ UINT        status;
 
     /* Inform user of success getting to this test.  */
     printf("Running Thread Stack Checking Test.................................. ");
+
+#ifdef TX_ENABLE_STACK_CHECKING
+    {
+    TX_THREAD *thread_ptr = &thread_2;
+    VOID *saved_pointer = thread_ptr -> tx_thread_stack_ptr;
+    VOID *saved_highest = thread_ptr -> tx_thread_stack_highest_ptr;
+
+        /* Check the boundary on a suspended thread with intact guard words.  */
+        thread_ptr -> tx_thread_stack_ptr = thread_ptr -> tx_thread_stack_start;
+        thread_ptr -> tx_thread_stack_highest_ptr = thread_ptr -> tx_thread_stack_start;
+        TX_THREAD_STACK_CHECK(thread_ptr)
+        thread_ptr -> tx_thread_stack_ptr = saved_pointer;
+        thread_ptr -> tx_thread_stack_highest_ptr = saved_highest;
+
+        if (stack_error != 0U)
+        {
+            printf("ERROR: stack check at the lower guard\n");
+            test_control_return(1);
+        }
+    }
+#endif
 
     /* Resume thread 1 to get the stack checking to take place.  */
     status =  tx_thread_resume(&thread_1);

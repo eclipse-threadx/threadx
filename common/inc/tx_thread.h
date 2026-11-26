@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -206,7 +207,15 @@
    low address to high address (the default logic is for stacks that
    grow from high address to low address.  */
 
+#if defined(TXM_MODULE_MANAGER) && defined(TX_ENABLE_STACK_CHECKING)
+VOID        _txm_module_manager_thread_stack_check(TX_THREAD *thread_ptr);
+ULONG      *_tx_thread_stack_analyze_range(ULONG *stack_lowest, ULONG *stack_limit, ULONG stack_fill);
+#endif
+
 #ifndef TX_THREAD_STACK_CHECK
+#if defined(TXM_MODULE_MANAGER) && defined(TX_ENABLE_STACK_CHECKING)
+#define TX_THREAD_STACK_CHECK(thread_ptr) _txm_module_manager_thread_stack_check(thread_ptr);
+#else
 #define TX_THREAD_STACK_CHECK(thread_ptr)                                                                                       \
     {                                                                                                                           \
     TX_INTERRUPT_SAVE_AREA                                                                                                      \
@@ -225,7 +234,8 @@
                 _tx_thread_stack_error_handler((thread_ptr));                                                                   \
                 TX_DISABLE                                                                                                      \
             }                                                                                                                   \
-            else if (*(((ULONG *) (thread_ptr) -> tx_thread_stack_highest_ptr) - 1) != TX_STACK_FILL)                           \
+            else if ((((ULONG *) (thread_ptr) -> tx_thread_stack_highest_ptr) > ((ULONG *) (thread_ptr) -> tx_thread_stack_start)) && \
+                     (*(((ULONG *) (thread_ptr) -> tx_thread_stack_highest_ptr) - 1) != TX_STACK_FILL))                           \
             {                                                                                                                   \
                 TX_RESTORE                                                                                                      \
                 _tx_thread_stack_analyze((thread_ptr));                                                                         \
@@ -234,6 +244,7 @@
         }                                                                                                                       \
         TX_RESTORE                                                                                                              \
     }
+#endif
 #endif
 
 

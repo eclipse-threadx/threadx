@@ -154,7 +154,8 @@
    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
    checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
    define is negated, thereby forcing the stack fill which is necessary for the stack checking
-   logic.  */
+   logic. A Module Manager kernel also checks both stacks of a user-mode module thread.
+   Define TXM_MODULE_MANAGER for such kernels when building outside ThreadX CMake.  */
 
 /*
 #define TX_ENABLE_STACK_CHECKING

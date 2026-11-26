@@ -341,17 +341,11 @@ ULONG                   i;
     thread_ptr -> tx_thread_stack_fill_value =  stack_fill_value;
 #endif
 
-    /* Note that TX_ENABLE_STACK_CHECKING is not supported for module threads.  A user mode
-       module thread owns two stacks and the scheduler swaps tx_thread_stack_start,
-       tx_thread_stack_end and tx_thread_stack_size over to the kernel stack whenever the
-       thread enters the module manager.  Neither tx_thread_stack_highest_ptr nor the guard
-       pattern beyond the end of the stack is maintained across that switch, so
-       TX_THREAD_STACK_CHECK may report spurious stack errors for module threads.  */
-
     /* If the thread runs on user mode, allocate the kernel stack for syscall.  */
     if((module_instance -> txm_module_instance_property_flags) & TXM_MODULE_USER_MODE)
     {
         ULONG status;
+        ALIGN_TYPE kernel_stack_top;
 
         /* Allocate kernel stack space. */
         status = _txm_module_manager_object_allocate((VOID **) &(thread_ptr -> tx_thread_module_kernel_stack_start), TXM_MODULE_KERNEL_STACK_SIZE, module_instance);
@@ -367,16 +361,25 @@ ULONG                   i;
         TX_MEMSET(thread_ptr -> tx_thread_module_kernel_stack_start, ((UCHAR) TX_STACK_FILL), TXM_MODULE_KERNEL_STACK_SIZE);
 #endif
 
-        /* Align kernel stack pointer.  */
-        thread_ptr -> tx_thread_module_kernel_stack_end = (VOID *) (((ALIGN_TYPE)(thread_ptr -> tx_thread_module_kernel_stack_start) + TXM_MODULE_KERNEL_STACK_SIZE) & ~0x07);
+        kernel_stack_top = (ALIGN_TYPE) thread_ptr -> tx_thread_module_kernel_stack_start + TXM_MODULE_KERNEL_STACK_SIZE;
+#ifdef TX_ENABLE_STACK_CHECKING
+        /* Leave room for the guard at the aligned, exclusive stack end.  */
+        kernel_stack_top -= sizeof(ULONG);
+#endif
+        thread_ptr -> tx_thread_module_kernel_stack_end = (VOID *) (kernel_stack_top & ~((ALIGN_TYPE) 0x07));
 
         /* Set kernel stack size.  Aligning the end of the kernel stack downwards can consume
            up to seven bytes of the block returned by the allocator, so the usable size must be
            derived from the aligned range instead of from TXM_MODULE_KERNEL_STACK_SIZE.  */
         thread_ptr -> tx_thread_module_kernel_stack_size = (ULONG) ((ALIGN_TYPE) (thread_ptr -> tx_thread_module_kernel_stack_end) - (ALIGN_TYPE) (thread_ptr -> tx_thread_module_kernel_stack_start));
+
+#ifdef TX_ENABLE_STACK_CHECKING
+        /* Setup the highest usage pointer for the kernel stack.  */
+        thread_ptr -> tx_thread_module_kernel_stack_highest_ptr =  thread_ptr -> tx_thread_module_kernel_stack_end;
+#endif
     }
 
-#if TXM_MODULE_MEMORY_PROTECTION
+#if TXM_MODULE_MEMORY_PROTECTION || defined(TX_ENABLE_STACK_CHECKING)
     /* Place the stack parameters into the thread's control block.  */
     thread_ptr -> tx_thread_module_stack_start =  stack_start;
     thread_ptr -> tx_thread_module_stack_size =   stack_size;
@@ -424,9 +427,9 @@ ULONG                   i;
     temp_ptr =  TX_VOID_TO_UCHAR_POINTER_CONVERT(stack_start);
     temp_ptr =  (TX_UCHAR_POINTER_ADD(temp_ptr, (stack_size - ((ULONG) 1))));
     thread_ptr -> tx_thread_stack_end =         TX_UCHAR_TO_VOID_POINTER_CONVERT(temp_ptr);
-#if TXM_MODULE_MEMORY_PROTECTION
+#if TXM_MODULE_MEMORY_PROTECTION || defined(TX_ENABLE_STACK_CHECKING)
     thread_ptr -> tx_thread_module_stack_end =  thread_ptr -> tx_thread_stack_end;
-#endif /* TXM_MODULE_MEMORY_PROTECTION */
+#endif
 
 #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
 
@@ -818,5 +821,116 @@ UINT  _txm_module_manager_thread_create_ptr(TX_THREAD *thread_ptr, TX_NAME_CONST
                             TX_NULL, 0UL, entry_function, entry_input,
                             stack_start, stack_size, priority, preempt_threshold,
                             time_slice, auto_start, thread_control_block_size, module_instance));
+}
+#endif
+
+#if defined(TXM_MODULE_MANAGER) && defined(TX_ENABLE_STACK_CHECKING)
+/* Compare addresses without ordering pointers from different stack allocations.
+   MISRA C:2023 Rules 11.4 and 11.6 apply to the pointer-width address conversions.  */
+static UINT  _txm_module_manager_stack_contains(const ULONG *start, const ULONG *end, const VOID *pointer)
+{
+ALIGN_TYPE address = (ALIGN_TYPE) pointer;
+
+    return((UINT) ((address >= (ALIGN_TYPE) start) && (address <= (ALIGN_TYPE) end)));
+}
+
+/* Check a stack's guards and update its watermark while its allocation is protected.  */
+static UINT  _txm_module_manager_stack_check_range(ULONG *start, ULONG *guard, VOID *saved_pointer,
+                                                   VOID **watermark, ULONG fill)
+{
+ULONG *highest = TX_VOID_TO_ULONG_POINTER_CONVERT(*watermark);
+
+    if (_txm_module_manager_stack_contains(start, guard, highest) == TX_FALSE)
+    {
+        return(TX_TRUE);
+    }
+
+    if ((*start != fill) || (*guard != fill))
+    {
+        return(TX_TRUE);
+    }
+
+    if ((saved_pointer != TX_NULL) && (TX_VOID_TO_ULONG_POINTER_CONVERT(saved_pointer) < highest))
+    {
+        highest = TX_VOID_TO_ULONG_POINTER_CONVERT(saved_pointer);
+    }
+
+    if ((highest > start) && (*TX_ULONG_POINTER_SUB(highest, 1) != fill))
+    {
+        highest = _tx_thread_stack_analyze_range(start, highest, fill);
+    }
+    *watermark = highest;
+
+    return(TX_FALSE);
+}
+
+/* Check both module stacks and associate the saved context with its allocation.  */
+VOID  _txm_module_manager_thread_stack_check(TX_THREAD *thread_ptr)
+{
+TX_INTERRUPT_SAVE_AREA
+
+UINT    stack_error = TX_FALSE;
+VOID    *saved_pointer;
+ULONG   *stack_start;
+ULONG   *stack_guard;
+ULONG   *kernel_start;
+ULONG   *kernel_guard;
+UINT    saved_on_stack;
+UINT    saved_on_kernel;
+
+    TX_DISABLE
+    if ((thread_ptr != TX_NULL) && (thread_ptr -> tx_thread_id == TX_THREAD_ID))
+    {
+        saved_pointer = thread_ptr -> tx_thread_stack_ptr;
+        kernel_start = TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_module_kernel_stack_start);
+        if (kernel_start == TX_NULL)
+        {
+            stack_start = TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_stack_start);
+            stack_guard = TX_VOID_TO_ULONG_POINTER_CONVERT(TX_UCHAR_POINTER_ADD(
+                TX_VOID_TO_UCHAR_POINTER_CONVERT(thread_ptr -> tx_thread_stack_end), 1));
+            if (_txm_module_manager_stack_contains(stack_start, stack_guard, saved_pointer) == TX_TRUE)
+            {
+                stack_error = _txm_module_manager_stack_check_range(stack_start, stack_guard, saved_pointer,
+                    &thread_ptr -> tx_thread_stack_highest_ptr, TX_STACK_FILL);
+            }
+            else
+            {
+                stack_error = TX_TRUE;
+            }
+        }
+        else
+        {
+            stack_start = TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_module_stack_start);
+            stack_guard = TX_VOID_TO_ULONG_POINTER_CONVERT(TX_UCHAR_POINTER_ADD(
+                TX_VOID_TO_UCHAR_POINTER_CONVERT(thread_ptr -> tx_thread_module_stack_end), 1));
+            kernel_guard = TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_module_kernel_stack_end);
+
+            /* Until the scheduler saves a new context, its saved pointer can name either stack.  */
+            saved_on_stack = _txm_module_manager_stack_contains(stack_start, stack_guard, saved_pointer);
+            saved_on_kernel = _txm_module_manager_stack_contains(kernel_start, kernel_guard, saved_pointer);
+            if ((saved_on_stack == TX_FALSE) && (saved_on_kernel == TX_FALSE))
+            {
+                stack_error = TX_TRUE;
+            }
+            else
+            {
+                stack_error = _txm_module_manager_stack_check_range(stack_start, stack_guard,
+                    (saved_on_stack == TX_TRUE) ? saved_pointer : TX_NULL,
+                    &thread_ptr -> tx_thread_stack_highest_ptr, TX_STACK_FILL);
+                if (stack_error == TX_FALSE)
+                {
+                    stack_error = _txm_module_manager_stack_check_range(kernel_start, kernel_guard,
+                        (saved_on_kernel == TX_TRUE) ? saved_pointer : TX_NULL,
+                        &thread_ptr -> tx_thread_module_kernel_stack_highest_ptr, TX_STACK_FILL);
+                }
+            }
+        }
+    }
+    TX_RESTORE
+
+    if (stack_error == TX_TRUE)
+    {
+        _tx_thread_stack_error_handler(thread_ptr);
+    }
 }
 #endif

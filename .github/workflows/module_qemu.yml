@@ -123,13 +123,14 @@ jobs:
         status=0
         for port in cortex_m3 cortex_m4; do
           for pointer_context in OFF ON; do
-            config="$port (pointer context $pointer_context)"
+            config="$port (pointer context and stack checking $pointer_context)"
             build="build/module_qemu_${port}_$pointer_context"
             echo "== $config"
 
             if ! cmake -S test/tx/cmake/module_qemu -B "$build" -G Ninja \
                     -DCMAKE_TOOLCHAIN_FILE="$PWD/test/tx/cmake/module_qemu/arm-none-eabi-qemu.cmake" \
-                    -DMODULE_QEMU_PORT="$port" -DMODULE_QEMU_POINTER_CONTEXT="$pointer_context"; then
+                    -DMODULE_QEMU_PORT="$port" -DMODULE_QEMU_POINTER_CONTEXT="$pointer_context" \
+                    -DMODULE_QEMU_STACK_CHECKING="$pointer_context"; then
               echo "::error::$config: CMake configure failed"
               status=1
               continue
