@@ -56,8 +56,9 @@ extern unsigned long _tx_thread_priority_map;
 /* Prototype for test control return.  */
 void  test_control_return(UINT status);
 
-/* Prototype for internal function.  */
+/* Prototype for internal functions.  */
 VOID  _tx_thread_smp_simple_priority_change(TX_THREAD *thread_ptr,UINT new_priority);
+UINT  _tx_thread_smp_next_priority_find(UINT priority);
 
 
 /* This test routine is used to get a thread of a non ready state.  */
@@ -486,6 +487,14 @@ TX_THREAD   *temp_thread;
        not inheriting one, so nothing downstream reasons about a phantom.  */
     thread_0.tx_thread_inherit_priority =  TX_MAX_PRIORITIES;
     TX_RESTORE
+
+    /* Verify that calling _tx_thread_smp_next_priority_find with a priority
+       at the maximum limit returns TX_MAX_PRIORITIES without an out-of-range shift.  */
+    if (_tx_thread_smp_next_priority_find(TX_MAX_PRIORITIES) != ((UINT) TX_MAX_PRIORITIES))
+    {
+        printf("ERROR #16\n");
+        test_control_return(1);
+    }
 
     /* Successful test.  */
     printf("SUCCESS!\n");
