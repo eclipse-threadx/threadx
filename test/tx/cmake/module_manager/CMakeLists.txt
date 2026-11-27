@@ -402,7 +402,9 @@ add_executable(
   ${module_manager_dir}/src/txm_module_manager_object_allocate.c
   ${module_manager_dir}/src/txm_module_manager_object_deallocate.c
   ${module_manager_dir}/src/txm_module_manager_util.c
-  ${REPO_ROOT}/common/src/tx_thread_stack_analyze.c)
+  ${REPO_ROOT}/common/src/tx_thread_stack_analyze.c
+  ${REPO_ROOT}/common/src/tx_trace_initialize.c
+  ${REPO_ROOT}/common/src/tx_trace_object_register.c)
 
 target_include_directories(
   threadx_module_manager_thread_stack_checking_test
