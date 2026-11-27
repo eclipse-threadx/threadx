@@ -33,7 +33,6 @@
 
 #define LIFECYCLE_CYCLES        ((ULONG) 2UL)
 #define MODULE_WAIT_TICKS       ((ULONG) 500UL)
-#define PROTECTED_PROPERTIES    ((ULONG) 0x02000007UL)  /* GNU; user mode, memory protection, shared memory */
 
 extern UCHAR                    module_services_protected[];
 
@@ -109,7 +108,8 @@ ULONG   available_before;
         harness_expect("memory load", (ULONG) txm_module_manager_memory_load(&test_module, "services protected",
                                                                              (VOID *) module_services_protected),
                        (ULONG) TX_SUCCESS);
-        harness_expect("module properties", test_module.txm_module_instance_property_flags, PROTECTED_PROPERTIES);
+        harness_expect("module properties", test_module.txm_module_instance_property_flags,
+                       (ULONG) HARNESS_PROTECTED_PROPERTIES);
         harness_expect("shared area grant", (ULONG) harness_shared_grant(&test_module), (ULONG) TX_SUCCESS);
         harness_expect("module start", (ULONG) txm_module_manager_start(&test_module), (ULONG) TX_SUCCESS);
         harness_expect("module finished", (ULONG) harness_wait_for_module(MODULE_WAIT_TICKS), (ULONG) TX_TRUE);

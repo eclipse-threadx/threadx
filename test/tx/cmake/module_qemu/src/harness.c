@@ -73,7 +73,11 @@ static ULONG  harness_semihost(ULONG operation, ULONG parameter)
 register ULONG r0 __asm__("r0") = operation;
 register ULONG r1 __asm__("r1") = parameter;
 
+#ifdef HARNESS_CORTEX_A7
+    __asm__ volatile ("svc 0x123456" : "+r"(r0) : "r"(r1) : "memory");
+#else
     __asm__ volatile ("bkpt 0xab" : "+r"(r0) : "r"(r1) : "memory");
+#endif
     return(r0);
 }
 
@@ -172,8 +176,13 @@ VOID  harness_fault_notify(TX_THREAD *thread_ptr, TXM_MODULE_INSTANCE *module_in
 {
     harness_fault_thread =   thread_ptr;
     harness_fault_module =   module_instance;
+#ifdef HARNESS_CORTEX_A7
+    harness_fault_address =  _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_dfar;
+    harness_fault_status =   _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_dfsr;
+#else
     harness_fault_address =  _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_mmfar;
     harness_fault_status =   _txm_module_manager_memory_fault_info.txm_module_manager_memory_fault_info_cfsr;
+#endif
     harness_fault_count++;
 }
 
@@ -191,8 +200,14 @@ ULONG   index;
 
 UINT  harness_shared_grant(TXM_MODULE_INSTANCE *module_instance)
 {
+#ifdef HARNESS_CORTEX_A7
+    /* Execute-never, user read/write, and normal non-cacheable memory.  */
+    return(txm_module_manager_external_memory_enable(module_instance, (VOID *) MODULE_SHARED_BASE,
+                                                     MODULE_SHARED_SIZE, 0x39U));
+#else
     return(txm_module_manager_external_memory_enable(module_instance, (VOID *) MODULE_SHARED_BASE,
                                                      MODULE_SHARED_SIZE, TXM_MODULE_MANAGER_SHARED_ATTRIBUTE_WRITE));
+#endif
 }
 
 
@@ -232,6 +247,10 @@ static VOID  harness_thread_entry(ULONG thread_input)
     harness_expect("txm_module_manager_memory_fault_notify",
                    (ULONG) txm_module_manager_memory_fault_notify(harness_fault_notify),
                    (ULONG) TX_SUCCESS);
+#ifdef HARNESS_CORTEX_A7
+    harness_expect("txm_module_manager_mm_initialize",
+                   (ULONG) txm_module_manager_mm_initialize(), (ULONG) TX_SUCCESS);
+#endif
 
     harness_test();
     harness_finish();

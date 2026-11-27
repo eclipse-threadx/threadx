@@ -27,15 +27,19 @@
 /* A module reports what it did through a small area of RAM that the manager
    grants it with txm_module_manager_external_memory_enable.  The area is at a
    fixed address, outside everything the manager image links, so that both
-   images can name it without either knowing the other's layout.  Its base and
-   size meet the Cortex-M MPU's rule that a region is a power of two in size
-   and aligned to that size.  */
+   images can name it without either knowing the other's layout. Its base and
+   size match the Cortex-A7 MMU page or the Cortex-M MPU region.  */
 
 #ifndef MODULE_SHARED_H
 #define MODULE_SHARED_H
 
+#ifdef HARNESS_CORTEX_A7
+#define MODULE_SHARED_BASE          ((ULONG) 0x40200000UL)
+#define MODULE_SHARED_SIZE          ((ULONG) 4096UL)
+#else
 #define MODULE_SHARED_BASE          ((ULONG) 0x20100000UL)
 #define MODULE_SHARED_SIZE          ((ULONG) 256UL)
+#endif
 #define MODULE_SHARED_WORDS         (MODULE_SHARED_SIZE / ((ULONG) sizeof(ULONG)))
 
 #define MODULE_SHARED               ((volatile ULONG *) MODULE_SHARED_BASE)
@@ -58,7 +62,7 @@
 #define MODULE_OUT_KERNEL_READ_TRY  ((ULONG) 16UL)  /* Kernel word read about to happen     */
 #define MODULE_OUT_KERNEL_READ_DONE ((ULONG) 17UL)  /* Kernel word read completed           */
 #define MODULE_OUT_KERNEL_VALUE     ((ULONG) 18UL)  /* Value read from the kernel word      */
-#define MODULE_OUT_CONTROL          ((ULONG) 19UL)  /* CONTROL as seen by the start thread  */
+#define MODULE_OUT_CONTROL          ((ULONG) 19UL)  /* Mode as seen by the start thread     */
 #define MODULE_OUT_POINTER_STATUS   ((ULONG) 20UL)  /* First pointer API error              */
 #define MODULE_OUT_POINTER_THREADS  ((ULONG) 21UL)  /* Thread entries with intact context   */
 #define MODULE_OUT_POINTER_TIMERS   ((ULONG) 22UL)  /* Pointer callbacks with intact context */
