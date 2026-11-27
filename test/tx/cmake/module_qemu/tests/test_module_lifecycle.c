@@ -39,6 +39,17 @@ extern UCHAR                    module_services_protected[];
 
 static TXM_MODULE_INSTANCE      test_module;
 
+#ifdef TX_ENABLE_STACK_CHECKING
+static volatile ULONG           stack_error_count;
+
+/* Count every stack error reported during a normal module lifecycle.  */
+static VOID  stack_error_notify(TX_THREAD *thread_ptr)
+{
+    TX_PARAMETER_NOT_USED(thread_ptr);
+    stack_error_count++;
+}
+#endif
+
 #ifdef TX_ENABLE_POINTER_CONTEXT
 /* Timer messages with different callback types must remain separate.  */
 static VOID  check_timer_message_types(VOID)
@@ -93,6 +104,10 @@ ULONG   available_before;
 
     harness_print("Module lifecycle: protected module, load/start/stop/unload twice\n");
 
+#ifdef TX_ENABLE_STACK_CHECKING
+    harness_expect("stack error notify registered", tx_thread_stack_error_notify(stack_error_notify), TX_SUCCESS);
+#endif
+
 #ifdef TX_ENABLE_POINTER_CONTEXT
     check_timer_message_types();
 #endif
@@ -129,4 +144,8 @@ ULONG   available_before;
 #endif
         harness_expect("module memory returned", harness_module_pool_available(), available_before);
     }
+
+#ifdef TX_ENABLE_STACK_CHECKING
+    harness_expect("no stack errors during normal stack switches", stack_error_count, 0UL);
+#endif
 }

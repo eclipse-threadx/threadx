@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -292,7 +293,8 @@ TX_INTERRUPT_SAVE_AREA
             _tx_thread_stack_error_handler((thread_ptr));
             TX_DISABLE
         }
-        if (*(((ULONG *) *highest_stack) - 1) != TX_STACK_FILL)
+        else if ((((ULONG *) *highest_stack) > ((ULONG *) (thread_ptr -> tx_thread_stack_start))) &&
+                 (*(((ULONG *) *highest_stack) - 1) != TX_STACK_FILL))
         {
             TX_RESTORE
             _tx_thread_stack_analyze((thread_ptr));

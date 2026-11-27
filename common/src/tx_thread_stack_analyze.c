@@ -31,6 +31,97 @@
 #include "tx_thread.h"
 
 
+/* Find the first used word between the stack base and the known watermark.  */
+#if !defined(TXM_MODULE_MANAGER) || !defined(TX_ENABLE_STACK_CHECKING)
+static
+#endif
+ULONG  *_tx_thread_stack_analyze_range(ULONG *stack_lowest, ULONG *stack_limit, ULONG stack_fill)
+{
+ULONG       *stack_ptr;
+ULONG       *stack_highest = stack_limit;
+ULONG       *probe_ptr;
+ULONG       probe_count;
+UINT        fill_present;
+ULONG       size;
+
+    /* We need to binary search the remaining stack for missing 0xEFEFEFEF 32-bit data pattern.
+       This is a best effort algorithm to find the highest stack usage. */
+    do
+    {
+
+        /* Calculate the size again. */
+        size =  (ULONG) (TX_ULONG_POINTER_DIF(stack_highest, stack_lowest))/((ULONG) 2);
+        stack_ptr =  TX_ULONG_POINTER_ADD(stack_lowest, size);
+
+        /* Determine if the pattern is still there.  To avoid stopping on an
+           unwritten hole inside an otherwise used region, require several
+           consecutive fill words, working towards the lowest address.  The scan
+           stops at the lowest known fill location, since everything at or below
+           that point is already known to hold the fill pattern.  */
+        fill_present =  TX_TRUE;
+        probe_ptr =     stack_ptr;
+        probe_count =   TX_THREAD_STACK_ANALYZE_FILL_WORDS;
+        while (probe_count != ((ULONG) 0))
+        {
+
+            /* Determine if this word still holds the fill pattern.  */
+            if (*probe_ptr != stack_fill)
+            {
+
+                /* No, the probe location is in use.  */
+                fill_present =  TX_FALSE;
+                probe_count =   ((ULONG) 0);
+            }
+            else
+            {
+
+                /* Yes, account for this word.  */
+                probe_count--;
+
+                /* Determine if the lowest known fill location has been reached.  */
+                if (probe_ptr <= stack_lowest)
+                {
+
+                    /* Yes, nothing further to check.  */
+                    probe_count =  ((ULONG) 0);
+                }
+                else
+                {
+
+                    /* Position to the previous word in the stack.  */
+                    probe_ptr =  TX_ULONG_POINTER_SUB(probe_ptr, 1);
+                }
+            }
+        }
+
+        /* Determine if the probe location is in use.  */
+        if (fill_present == TX_FALSE)
+        {
+
+            /* Update the stack highest, since we need to look in the upper half now.  */
+            stack_highest =  stack_ptr;
+        }
+        else
+        {
+
+            /* Update the stack lowest, since we need to look in the lower half now.  */
+            stack_lowest =  stack_ptr;
+        }
+
+    } while(size > ((ULONG) 1));
+
+    /* Position to first used word - at this point we are within a few words.  */
+    while ((stack_ptr < stack_limit) && (*stack_ptr == stack_fill))
+    {
+
+        /* Position to next word in stack.  */
+        stack_ptr =  TX_ULONG_POINTER_ADD(stack_ptr, 1);
+    }
+
+    return(stack_ptr);
+}
+
+
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -72,11 +163,6 @@ TX_INTERRUPT_SAVE_AREA
 ULONG       *stack_ptr;
 ULONG       *stack_lowest;
 ULONG       *stack_highest;
-ULONG       *probe_ptr;
-ULONG       *stack_limit;
-ULONG       probe_count;
-UINT        fill_present;
-ULONG       size;
 
 
     /* Disable interrupts.  */
@@ -107,85 +193,10 @@ ULONG       size;
                 if ((stack_highest != TX_NULL) && (stack_highest > stack_lowest))
                 {
 
-                    /* Remember the upper bound of the search so the scan below cannot run past it.  */
-                    stack_limit =  stack_highest;
-
                     /* Restore interrupts.  */
                     TX_RESTORE
 
-                    /* We need to binary search the remaining stack for missing 0xEFEFEFEF 32-bit data pattern.
-                       This is a best effort algorithm to find the highest stack usage. */
-                    do
-                    {
-
-                        /* Calculate the size again. */
-                        size =  (ULONG) (TX_ULONG_POINTER_DIF(stack_highest, stack_lowest))/((ULONG) 2);
-                        stack_ptr =  TX_ULONG_POINTER_ADD(stack_lowest, size);
-
-                        /* Determine if the pattern is still there.  To avoid stopping on an
-                           unwritten hole inside an otherwise used region, require several
-                           consecutive fill words, working towards the lowest address.  The scan
-                           stops at the lowest known fill location, since everything at or below
-                           that point is already known to hold the fill pattern.  */
-                        fill_present =  TX_TRUE;
-                        probe_ptr =     stack_ptr;
-                        probe_count =   TX_THREAD_STACK_ANALYZE_FILL_WORDS;
-                        while (probe_count != ((ULONG) 0))
-                        {
-
-                            /* Determine if this word still holds the fill pattern.  */
-                            if (*probe_ptr != TX_STACK_FILL)
-                            {
-
-                                /* No, the probe location is in use.  */
-                                fill_present =  TX_FALSE;
-                                probe_count =   ((ULONG) 0);
-                            }
-                            else
-                            {
-
-                                /* Yes, account for this word.  */
-                                probe_count--;
-
-                                /* Determine if the lowest known fill location has been reached.  */
-                                if (probe_ptr <= stack_lowest)
-                                {
-
-                                    /* Yes, nothing further to check.  */
-                                    probe_count =  ((ULONG) 0);
-                                }
-                                else
-                                {
-
-                                    /* Position to the previous word in the stack.  */
-                                    probe_ptr =  TX_ULONG_POINTER_SUB(probe_ptr, 1);
-                                }
-                            }
-                        }
-
-                        /* Determine if the probe location is in use.  */
-                        if (fill_present == TX_FALSE)
-                        {
-
-                            /* Update the stack highest, since we need to look in the upper half now.  */
-                            stack_highest =  stack_ptr;
-                        }
-                        else
-                        {
-
-                            /* Update the stack lowest, since we need to look in the lower half now.  */
-                            stack_lowest =  stack_ptr;
-                        }
-
-                    } while(size > ((ULONG) 1));
-
-                    /* Position to first used word - at this point we are within a few words.  */
-                    while ((stack_ptr < stack_limit) && (*stack_ptr == TX_STACK_FILL))
-                    {
-
-                        /* Position to next word in stack.  */
-                        stack_ptr =  TX_ULONG_POINTER_ADD(stack_ptr, 1);
-                    }
+                    stack_ptr = _tx_thread_stack_analyze_range(stack_lowest, stack_highest, TX_STACK_FILL);
 
                     /* Optional processing extension.  */
                     TX_THREAD_STACK_ANALYZE_EXTENSION

@@ -47,6 +47,7 @@ project(threadx_module_qemu LANGUAGES C ASM)
 set(MODULE_QEMU_PORT "cortex_m3" CACHE STRING "Cortex-M module port to build and run")
 set_property(CACHE MODULE_QEMU_PORT PROPERTY STRINGS cortex_m3 cortex_m4)
 option(MODULE_QEMU_POINTER_CONTEXT "Exercise the pointer-context module APIs" OFF)
+option(MODULE_QEMU_STACK_CHECKING "Check the module and kernel stacks" OFF)
 
 if(MODULE_QEMU_PORT STREQUAL "cortex_m3")
     set(PORT_CPU_FLAGS -mcpu=cortex-m3 -mthumb)
@@ -71,6 +72,9 @@ add_link_options(${PORT_CPU_FLAGS})
 if(MODULE_QEMU_POINTER_CONTEXT)
     add_compile_definitions(TX_ENABLE_POINTER_CONTEXT)
 endif()
+if(MODULE_QEMU_STACK_CHECKING)
+    add_compile_definitions(TX_ENABLE_STACK_CHECKING)
+endif()
 
 # ---------------------------------------------------------------------------
 # The kernel and the Module Manager, built with the module port's headers.
@@ -91,6 +95,7 @@ file(GLOB TXM_PORT_SRC
 file(GLOB TXM_MANAGER_SRC ${REPO_ROOT}/common_modules/module_manager/src/*.c)
 
 add_library(threadx_module STATIC ${TX_COMMON_SRC} ${TXM_PORT_SRC} ${TXM_MANAGER_SRC})
+target_compile_definitions(threadx_module PUBLIC TXM_MODULE_MANAGER)
 target_include_directories(threadx_module PUBLIC
     ${PORT_DIR}/inc
     ${REPO_ROOT}/common/inc
