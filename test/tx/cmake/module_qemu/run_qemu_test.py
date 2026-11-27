@@ -42,16 +42,19 @@ def as_text(stream):
     return stream
 
 
-def run(qemu, machine, elf, timeout):
+def run(qemu, machine, elf, timeout, cpu=None):
     command = [
         qemu,
         "-M", machine,
+        "-nodefaults",
         "-nographic",
         "-monitor", "none",
         "-serial", "none",
         "-semihosting-config", "enable=on,target=native",
         "-kernel", elf,
     ]
+    if cpu is not None:
+        command.extend(["-cpu", cpu])
 
     print("Running:", " ".join(command), flush=True)
 
@@ -95,10 +98,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--qemu", required=True, help="qemu-system-arm executable")
     parser.add_argument("--machine", required=True, help="QEMU machine, e.g. mps2-an385")
+    parser.add_argument("--cpu", help="QEMU CPU when the board has no fixed model")
     parser.add_argument("--elf", required=True, help="image to run")
     parser.add_argument("--timeout", type=int, default=60, help="seconds before a hang is declared")
     args = parser.parse_args()
-    return run(args.qemu, args.machine, args.elf, args.timeout)
+    return run(args.qemu, args.machine, args.elf, args.timeout, args.cpu)
 
 
 if __name__ == "__main__":

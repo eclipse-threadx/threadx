@@ -5,8 +5,8 @@ name: module_qemu
 # Portions of this file were generated with AI assistance.
 #
 # Builds the module execution harness in test/tx/cmake/module_qemu for each
-# Cortex-M module port it covers and EXECUTES every image on QEMU's MPS2
-# board for that core, asserting each image's self-reported result.
+# Arm module port it covers and executes each image on the corresponding
+# QEMU machine, asserting its self-reported result.
 #
 # Why this exists: until this workflow landed, no Cortex-M module port ran in
 # CI. gcc_check compiles the module manager sources once per port and links
@@ -17,7 +17,7 @@ name: module_qemu
 # misbehaving module are only exercised by executing them, and r52_fvp does
 # that for the Cortex-R52 alone.
 #
-# What it covers, per port:
+# What it covers:
 #
 #   - cortex_m3 on mps2-an385 and cortex_m4 on mps2-an386, the latter built
 #     for its FPU with the hard-float ABI;
@@ -26,8 +26,10 @@ name: module_qemu
 #   - a protected module faulting on a read of kernel memory, reported to the
 #     application and terminated -- which is also the proof that QEMU's MPU is
 #     enforcing at all;
-#   - the same module built privileged and unprotected, whose identical read
-#     succeeds.
+#   - the same module built privileged and unprotected on Cortex-M, whose
+#     identical read succeeds;
+#   - the protected lifecycle on Cortex-A7 on virt with GICv2 and the
+#     architected timer.
 #
 # QEMU comes from the Ubuntu archive. The images report through semihosting
 # and end the simulation themselves, so a hang shows up as the runner's
@@ -43,6 +45,7 @@ on:
       - ".github/workflows/module_qemu.yml"
       - "common/**"
       - "common_modules/**"
+      - "ports_module/cortex_a7/**"
       - "ports_module/cortex_m3/**"
       - "ports_module/cortex_m4/**"
       - "test/tx/cmake/module_qemu/**"
@@ -55,6 +58,7 @@ on:
       - ".github/workflows/module_qemu.yml"
       - "common/**"
       - "common_modules/**"
+      - "ports_module/cortex_a7/**"
       - "ports_module/cortex_m3/**"
       - "ports_module/cortex_m4/**"
       - "test/tx/cmake/module_qemu/**"
@@ -121,7 +125,7 @@ jobs:
         arm-none-eabi-gcc --version | head -1
 
         status=0
-        for port in cortex_m3 cortex_m4; do
+        for port in cortex_m3 cortex_m4 cortex_a7; do
           for pointer_context in OFF ON; do
             config="$port (pointer context $pointer_context)"
             build="build/module_qemu_${port}_$pointer_context"

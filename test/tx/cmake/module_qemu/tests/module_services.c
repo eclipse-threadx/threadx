@@ -38,7 +38,7 @@
    module that faults never sets it.
 
    MISRA C:2023 deviations, confined to this test module: Rule 1.2 and
-   Directive 4.3 (inline assembly to read CONTROL), and Rule 11.4 (the shared
+   Directive 4.3 (inline assembly to read CPU mode), and Rule 11.4 (the shared
    area and the kernel word are integer addresses supplied at run time).  */
 
 #define TXM_MODULE
@@ -64,6 +64,20 @@ static ULONG        callback_context;
 
 VOID    module_start(ULONG id);
 
+/* Report unprivileged mode in bit zero, as in Cortex-M CONTROL.  */
+static ULONG  module_control(VOID)
+{
+ULONG control;
+
+#ifdef HARNESS_CORTEX_A7
+    __asm__ volatile ("mrs %0, cpsr" : "=r"(control));
+    control = ((control & 0x1fUL) == 0x10UL) ? 1UL : 0UL;
+#else
+    __asm__ volatile ("mrs %0, control" : "=r"(control));
+#endif
+    return(control);
+}
+
 
 /* Keep the first failing status rather than the last.  */
 static VOID  record_status(ULONG word, UINT status)
@@ -78,13 +92,12 @@ static VOID  record_status(ULONG word, UINT status)
 static VOID  worker_entry(ULONG thread_input)
 {
 ULONG   message;
-ULONG   control;
 
-    __asm__ volatile ("mrs %0, control" : "=r"(control));
     message = 0UL;
     if (tx_queue_receive(message_queue, &message, WAIT_TICKS) == TX_SUCCESS)
     {
-        if ((thread_input == MODULE_QUEUE_MESSAGE) && (control == MODULE_SHARED[MODULE_OUT_CONTROL]))
+        /* Check the mode restored after the blocking kernel service.  */
+        if ((thread_input == MODULE_QUEUE_MESSAGE) && (module_control() == MODULE_SHARED[MODULE_OUT_CONTROL]))
         {
             MODULE_SHARED[MODULE_OUT_QUEUE_VALUE] = message;
             MODULE_SHARED[MODULE_OUT_WORKER_RUNS]++;
@@ -109,7 +122,7 @@ static VOID  pointer_timer_entry(VOID *context)
 {
 ULONG control;
 
-    __asm__ volatile ("mrs %0, control" : "=r"(control));
+    control = module_control();
     if ((context == &callback_context) && (control == MODULE_SHARED[MODULE_OUT_CONTROL]))
     {
         MODULE_SHARED[MODULE_OUT_POINTER_TIMERS]++;
@@ -198,7 +211,7 @@ ULONG   kernel_word;
     MODULE_SHARED[MODULE_OUT_STARTED] =   MODULE_STARTED_MAGIC;
     MODULE_SHARED[MODULE_OUT_CYCLE_SEEN] = MODULE_SHARED[MODULE_IN_CYCLE];
 
-    __asm__ volatile ("mrs %0, control" : "=r"(control));
+    control = module_control();
     MODULE_SHARED[MODULE_OUT_CONTROL] = control;
 
     record_status(MODULE_OUT_OBJECT_STATUS, txm_module_object_allocate((VOID **) &message_queue, sizeof(TX_QUEUE)));

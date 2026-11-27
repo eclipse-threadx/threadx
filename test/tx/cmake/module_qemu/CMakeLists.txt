@@ -14,8 +14,8 @@
 # Module execution harness.
 #
 # Builds a module manager image per test, each embedding the modules it loads,
-# for one Cortex-M module port, and runs every image on QEMU's MPS2 board for
-# that core, asserting the result each image reports over semihosting.
+# for one Arm module port, and runs every image on QEMU, asserting the result
+# each image reports over semihosting.
 #
 # Why this exists: the host tests under test/tx/module_manager compile a few
 # module manager sources against stubs, and nothing else in CI runs a Cortex-M
@@ -37,15 +37,15 @@
 #   cmake --build build/module_qemu_m3
 #   ctest --test-dir build/module_qemu_m3 --output-on-failure
 #
-# MODULE_QEMU_PORT is cortex_m3 (QEMU mps2-an385) or cortex_m4 (mps2-an386,
-# built for its FPU with the hard-float ABI).
+# MODULE_QEMU_PORT is cortex_m3 (mps2-an385), cortex_m4 (mps2-an386, hard-float),
+# or cortex_a7 (virt with GICv2).
 
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 project(threadx_module_qemu LANGUAGES C ASM)
 
-set(MODULE_QEMU_PORT "cortex_m3" CACHE STRING "Cortex-M module port to build and run")
-set_property(CACHE MODULE_QEMU_PORT PROPERTY STRINGS cortex_m3 cortex_m4)
+set(MODULE_QEMU_PORT "cortex_m3" CACHE STRING "Arm module port to build and run")
+set_property(CACHE MODULE_QEMU_PORT PROPERTY STRINGS cortex_m3 cortex_m4 cortex_a7)
 option(MODULE_QEMU_POINTER_CONTEXT "Exercise the pointer-context module APIs" OFF)
 
 if(MODULE_QEMU_PORT STREQUAL "cortex_m3")
@@ -54,14 +54,35 @@ if(MODULE_QEMU_PORT STREQUAL "cortex_m3")
 elseif(MODULE_QEMU_PORT STREQUAL "cortex_m4")
     set(PORT_CPU_FLAGS -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard)
     set(QEMU_MACHINE mps2-an386)
+elseif(MODULE_QEMU_PORT STREQUAL "cortex_a7")
+    set(PORT_CPU_FLAGS -mcpu=cortex-a7 -marm -mfloat-abi=soft)
+    set(QEMU_MACHINE virt,gic-version=2)
+    set(QEMU_CPU_OPTION --cpu=cortex-a7)
+    # Reserve room for the unoptimized test's nested kernel calls.
+    add_compile_definitions(HARNESS_CORTEX_A7 TXM_MODULE_KERNEL_STACK_SIZE=1024)
 else()
-    message(FATAL_ERROR "MODULE_QEMU_PORT must be cortex_m3 or cortex_m4, not '${MODULE_QEMU_PORT}'")
+    message(FATAL_ERROR "Unsupported MODULE_QEMU_PORT: '${MODULE_QEMU_PORT}'")
 endif()
 
 set(REPO_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../../..)
 set(PORT_DIR ${REPO_ROOT}/ports_module/${MODULE_QEMU_PORT}/gnu)
 set(HARNESS_SRC ${CMAKE_CURRENT_LIST_DIR}/src)
 set(HARNESS_TESTS ${CMAKE_CURRENT_LIST_DIR}/tests)
+
+if(MODULE_QEMU_PORT STREQUAL "cortex_a7")
+    set(MANAGER_STARTUP ${HARNESS_SRC}/cortex_a7_startup.S)
+    set(MANAGER_LINKER ${HARNESS_SRC}/cortex_a7_manager.ld)
+    set(MODULE_SETUP ${PORT_DIR}/example_build/gcc_setup.S)
+    # The port's linker script leaves .dynamic below the module preamble.
+    set(MODULE_OBJCOPY_OPTIONS -R .dynamic)
+    set(PROTECTED_PROPERTIES 0x02000003)
+else()
+    set(MANAGER_STARTUP ${HARNESS_SRC}/startup.S ${HARNESS_SRC}/tx_initialize_low_level.S)
+    set(MANAGER_LINKER ${HARNESS_SRC}/manager.ld)
+    set(MODULE_SETUP ${PORT_DIR}/example_build/gcc_setup.s)
+    set(PROTECTED_PROPERTIES 0x02000007)
+endif()
+add_compile_definitions(HARNESS_PROTECTED_PROPERTIES=${PROTECTED_PROPERTIES})
 
 message(STATUS "Module port: ${MODULE_QEMU_PORT}, QEMU machine: ${QEMU_MACHINE}")
 
@@ -133,7 +154,7 @@ target_compile_options(txm_module_lib PRIVATE -fpic ${MODULE_PIC_FLAGS})
 function(module_qemu_add_module name source properties)
     add_executable(${name}.elf
         ${HARNESS_SRC}/module_preamble.S
-        ${PORT_DIR}/example_build/gcc_setup.s
+        ${MODULE_SETUP}
         ${source})
     target_include_directories(${name}.elf PRIVATE ${HARNESS_SRC})
     target_compile_definitions(${name}.elf PRIVATE TEST_MODULE_PROPERTIES=${properties})
@@ -154,7 +175,7 @@ function(module_qemu_add_module name source properties)
     set(bin ${CMAKE_CURRENT_BINARY_DIR}/${name}.bin)
     add_custom_command(
         OUTPUT ${bin}
-        COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${name}.elf> ${bin}
+        COMMAND ${CMAKE_OBJCOPY} -O binary ${MODULE_OBJCOPY_OPTIONS} $<TARGET_FILE:${name}.elf> ${bin}
         DEPENDS ${name}.elf
         COMMENT "Converting ${name} to a raw module image"
         VERBATIM)
@@ -170,9 +191,7 @@ endfunction()
 
 # GNU compiler ID in bits 31-24; bit 0 user mode, bit 1 memory protection,
 # bit 2 shared memory access.
-module_qemu_add_module(module_services_protected  ${HARNESS_TESTS}/module_services.c 0x02000007)
-module_qemu_add_module(module_services_privileged ${HARNESS_TESTS}/module_services.c 0x02000000)
-module_qemu_add_module(module_stack_frame         ${HARNESS_TESTS}/module_stack_frame.c 0x02000007)
+module_qemu_add_module(module_services_protected ${HARNESS_TESTS}/module_services.c ${PROTECTED_PROPERTIES})
 
 # ---------------------------------------------------------------------------
 # The manager images, one per test, and the CTest entries that run them.
@@ -191,8 +210,7 @@ function(module_qemu_add_test name test_source)
     endforeach()
 
     add_executable(${name}.elf
-        ${HARNESS_SRC}/startup.S
-        ${HARNESS_SRC}/tx_initialize_low_level.S
+        ${MANAGER_STARTUP}
         ${HARNESS_SRC}/harness.c
         ${HARNESS_TESTS}/harness_checks.c
         ${test_source}
@@ -200,14 +218,14 @@ function(module_qemu_add_test name test_source)
     target_include_directories(${name}.elf PRIVATE ${HARNESS_SRC} ${HARNESS_TESTS})
     target_link_libraries(${name}.elf PRIVATE threadx_module)
     target_link_options(${name}.elf PRIVATE
-        -T${HARNESS_SRC}/manager.ld
+        -T${MANAGER_LINKER}
         -nostartfiles
         --specs=nano.specs
         --specs=nosys.specs
         -Wl,--gc-sections
         -Wl,--no-warn-rwx-segments
         -Wl,-Map=${name}.map)
-    set_target_properties(${name}.elf PROPERTIES LINK_DEPENDS ${HARNESS_SRC}/manager.ld)
+    set_target_properties(${name}.elf PROPERTIES LINK_DEPENDS ${MANAGER_LINKER})
     foreach(blob IN LISTS blobs)
         add_dependencies(${name}.elf ${blob}_bin)
     endforeach()
@@ -217,14 +235,19 @@ function(module_qemu_add_test name test_source)
                  COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/run_qemu_test.py
                          --qemu ${QEMU_SYSTEM_ARM}
                          --machine ${QEMU_MACHINE}
+                         ${QEMU_CPU_OPTION}
                          --elf $<TARGET_FILE:${name}.elf>)
     endif()
 endfunction()
 
 module_qemu_add_test(test_module_lifecycle  ${HARNESS_TESTS}/test_module_lifecycle.c  module_services_protected)
-module_qemu_add_test(test_module_fault      ${HARNESS_TESTS}/test_module_fault.c      module_services_protected)
-module_qemu_add_test(test_module_privileged ${HARNESS_TESTS}/test_module_privileged.c module_services_privileged)
-module_qemu_add_test(test_module_stack_frame ${HARNESS_TESTS}/test_module_stack_frame.c module_stack_frame)
+if(NOT MODULE_QEMU_PORT STREQUAL "cortex_a7")
+    module_qemu_add_module(module_services_privileged ${HARNESS_TESTS}/module_services.c 0x02000000)
+    module_qemu_add_module(module_stack_frame ${HARNESS_TESTS}/module_stack_frame.c ${PROTECTED_PROPERTIES})
+    module_qemu_add_test(test_module_fault ${HARNESS_TESTS}/test_module_fault.c module_services_protected)
+    module_qemu_add_test(test_module_privileged ${HARNESS_TESTS}/test_module_privileged.c module_services_privileged)
+    module_qemu_add_test(test_module_stack_frame ${HARNESS_TESTS}/test_module_stack_frame.c module_stack_frame)
+endif()
 
 if(NOT (Python3_FOUND AND QEMU_SYSTEM_ARM))
     message(STATUS "qemu-system-arm or Python 3 not found; the images build but no tests are registered.")
