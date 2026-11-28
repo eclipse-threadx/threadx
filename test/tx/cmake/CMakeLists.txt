@@ -120,6 +120,8 @@ endif()
 # skip them.
 if(NOT MSVC AND NOT ("TX_MISRA_ENABLE" IN_LIST ${CMAKE_BUILD_TYPE}))
   add_subdirectory(module_manager)
+  add_subdirectory(low_power)
+  add_subdirectory(execution_profile)
 endif()
 
 # Coverage
