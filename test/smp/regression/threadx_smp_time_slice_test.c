@@ -270,10 +270,38 @@ UINT    status;
     }
     else
     {
+        ULONG   old_slice;
 
-        /* Successful test.  */
-        printf("SUCCESS!\n");
-        test_control_return(0);
+        /* Terminate all but two equal-priority threads so time-slicing them
+           while both occupy cores walks the entire ready list back to the
+           current thread without finding an unscheduled thread.  */
+        status =  tx_thread_terminate(&thread_31c);
+        status += tx_thread_terminate(&thread_31d);
+        status += tx_thread_terminate(&thread_31e);
+        status += tx_thread_terminate(&thread_31f);
+        status += tx_thread_terminate(&thread_31g);
+        status += tx_thread_terminate(&thread_31h);
+        status += tx_thread_smp_core_exclude(&thread_31a, 0);
+        status += tx_thread_smp_core_exclude(&thread_31b, 0);
+        status += tx_thread_time_slice_change(&thread_31a, 1, &old_slice);
+        status += tx_thread_time_slice_change(&thread_31b, 1, &old_slice);
+        thread_31a_counter = 0;
+        thread_31b_counter = 0;
+
+        tx_thread_sleep(10);
+
+        if ((status != TX_SUCCESS) || (thread_31a_counter == 0) || (thread_31b_counter == 0))
+        {
+            printf("ERROR #31B\n");
+            test_control_return(1);
+        }
+        else
+        {
+
+            /* Successful test.  */
+            printf("SUCCESS!\n");
+            test_control_return(0);
+        }
     }
 }
 

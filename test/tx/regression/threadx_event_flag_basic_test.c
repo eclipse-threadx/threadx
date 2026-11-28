@@ -445,6 +445,18 @@ ULONG   actual_events;
         test_control_return(1);
     }
 
+    /* Get zero events with suspension.  */
+    status =  tx_event_flags_get(&group_0, 0, TX_OR, &actual_events, 10);
+
+    /* Check status.  */
+    if (status != TX_NO_EVENTS)
+    {
+
+        /* Event flag error.  */
+        printf("ERROR #16b\n");
+        test_control_return(1);
+    }
+
     /* Set evetns with a NULL group pointer.   */
     status =  tx_event_flags_set(TX_NULL, 0x80008000, TX_OR);
 

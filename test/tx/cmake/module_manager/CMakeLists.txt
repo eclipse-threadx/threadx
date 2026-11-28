@@ -393,3 +393,151 @@ target_compile_options(
 
 add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_load_bounds_test
          threadx_module_manager_load_bounds_test)
+
+if(NOT ("TX_DISABLE_NOTIFY_CALLBACKS" IN_LIST ${CMAKE_BUILD_TYPE}))
+  add_executable(
+    threadx_module_manager_callback_trampolines_test
+    ${SOURCE_DIR}/threadx_module_manager_callback_trampolines_test.c
+    ${module_manager_dir}/src/txm_module_manager_callback_request.c
+    ${module_manager_dir}/src/txm_module_manager_event_flags_notify_trampoline.c
+    ${module_manager_dir}/src/txm_module_manager_kernel_dispatch.c
+    ${module_manager_dir}/src/txm_module_manager_queue_notify_trampoline.c
+    ${module_manager_dir}/src/txm_module_manager_semaphore_notify_trampoline.c
+    ${module_manager_dir}/src/txm_module_manager_thread_notify_trampoline.c
+    ${module_manager_dir}/src/txm_module_manager_timer_notify_trampoline.c
+    ${module_manager_dir}/src/txm_module_manager_util.c)
+
+  target_include_directories(
+    threadx_module_manager_callback_trampolines_test
+    PRIVATE ${SOURCE_DIR}
+            ${REPO_ROOT}/common/inc
+            ${REPO_ROOT}/common_modules/inc
+            ${module_manager_dir}/inc
+            ${cortex_m4_module_dir}/inc)
+
+  set(trampoline_dispatchers
+      TXM_EVENT_FLAGS_SET_NOTIFY_CALL_NOT_USED
+      TXM_QUEUE_SEND_NOTIFY_CALL_NOT_USED
+      TXM_SEMAPHORE_PUT_NOTIFY_CALL_NOT_USED
+      TXM_THREAD_ENTRY_EXIT_NOTIFY_CALL_NOT_USED)
+
+  set(trampoline_guards ${dispatch_guards})
+  list(REMOVE_ITEM trampoline_guards ${trampoline_dispatchers})
+
+  target_compile_definitions(threadx_module_manager_callback_trampolines_test
+                             PRIVATE ${trampoline_guards})
+
+  target_compile_options(
+    threadx_module_manager_callback_trampolines_test
+    PRIVATE -Wall
+            -Wextra
+            "SHELL:-include ${SOURCE_DIR}/threadx_module_manager_load_bounds_state.h"
+            "SHELL:-include ${SOURCE_DIR}/threadx_module_manager_host_test_port.h")
+
+  add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_callback_trampolines_test
+           threadx_module_manager_callback_trampolines_test)
+endif()
+
+add_executable(
+  threadx_module_manager_lifecycle_test
+  ${SOURCE_DIR}/threadx_module_manager_lifecycle_test.c
+  ${module_manager_dir}/src/txm_module_manager_initialize.c
+  ${module_manager_dir}/src/txm_module_manager_internal_load.c
+  ${module_manager_dir}/src/txm_module_manager_maximum_module_priority_set.c
+  ${module_manager_dir}/src/txm_module_manager_object_allocate.c
+  ${module_manager_dir}/src/txm_module_manager_object_deallocate.c
+  ${module_manager_dir}/src/txm_module_manager_object_pool_create.c
+  ${module_manager_dir}/src/txm_module_manager_properties_get.c
+  ${module_manager_dir}/src/txm_module_manager_start.c
+  ${module_manager_dir}/src/txm_module_manager_stop.c
+  ${module_manager_dir}/src/txm_module_manager_thread_create.c
+  ${module_manager_dir}/src/txm_module_manager_thread_reset.c
+  ${module_manager_dir}/src/txm_module_manager_unload.c
+  ${module_manager_dir}/src/txm_module_manager_util.c)
+
+target_include_directories(
+  threadx_module_manager_lifecycle_test
+  PRIVATE ${SOURCE_DIR}
+          ${REPO_ROOT}/common/inc
+          ${REPO_ROOT}/common_modules/inc
+          ${module_manager_dir}/inc
+          ${cortex_m4_module_dir}/inc)
+
+target_compile_options(
+  threadx_module_manager_lifecycle_test
+  PRIVATE -Wall
+          -Wextra
+          "SHELL:-include ${SOURCE_DIR}/threadx_module_manager_load_bounds_state.h"
+          "SHELL:-include ${SOURCE_DIR}/threadx_module_manager_host_test_port.h")
+
+add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_lifecycle_test
+         threadx_module_manager_lifecycle_test)
+
+add_executable(
+  threadx_module_manager_dispatch_security_test
+  ${SOURCE_DIR}/threadx_module_manager_dispatch_security_test.c
+  ${module_manager_dir}/src/txm_module_manager_kernel_dispatch.c
+  ${module_manager_dir}/src/txm_module_manager_object_allocate.c
+  ${module_manager_dir}/src/txm_module_manager_object_deallocate.c
+  ${module_manager_dir}/src/txm_module_manager_object_pointer_get.c
+  ${module_manager_dir}/src/txm_module_manager_object_pointer_get_extended.c
+  ${module_manager_dir}/src/txm_module_manager_timer_notify_trampoline.c
+  ${module_manager_dir}/src/txm_module_manager_util.c)
+
+target_include_directories(
+  threadx_module_manager_dispatch_security_test
+  PRIVATE ${SOURCE_DIR}
+          ${REPO_ROOT}/common/inc
+          ${REPO_ROOT}/common_modules/inc
+          ${module_manager_dir}/inc
+          ${cortex_m4_module_dir}/inc)
+
+set(sec_dispatchers
+    TXM_BYTE_POOL_CREATE_CALL_NOT_USED
+    TXM_BYTE_POOL_DELETE_CALL_NOT_USED
+    TXM_BYTE_RELEASE_CALL_NOT_USED
+    TXM_EVENT_FLAGS_CREATE_CALL_NOT_USED
+    TXM_EVENT_FLAGS_DELETE_CALL_NOT_USED
+    TXM_EVENT_FLAGS_GET_CALL_NOT_USED
+    TXM_EVENT_FLAGS_SET_CALL_NOT_USED
+    TXM_MODULE_OBJECT_ALLOCATE_CALL_NOT_USED
+    TXM_MODULE_OBJECT_POINTER_GET_CALL_NOT_USED
+    TXM_MODULE_OBJECT_POINTER_GET_EXTENDED_CALL_NOT_USED
+    TXM_MUTEX_CREATE_CALL_NOT_USED
+    TXM_MUTEX_DELETE_CALL_NOT_USED
+    TXM_MUTEX_GET_CALL_NOT_USED
+    TXM_MUTEX_PRIORITIZE_CALL_NOT_USED
+    TXM_MUTEX_PUT_CALL_NOT_USED
+    TXM_SEMAPHORE_CEILING_PUT_CALL_NOT_USED
+    TXM_SEMAPHORE_CREATE_CALL_NOT_USED
+    TXM_SEMAPHORE_DELETE_CALL_NOT_USED
+    TXM_SEMAPHORE_GET_CALL_NOT_USED
+    TXM_SEMAPHORE_PUT_CALL_NOT_USED
+    TXM_THREAD_INTERRUPT_CONTROL_CALL_NOT_USED
+    TXM_THREAD_STACK_ERROR_NOTIFY_CALL_NOT_USED
+    TXM_TIMER_ACTIVATE_CALL_NOT_USED
+    TXM_TIMER_CHANGE_CALL_NOT_USED
+    TXM_TIMER_CREATE_CALL_NOT_USED
+    TXM_TIMER_DEACTIVATE_CALL_NOT_USED
+    TXM_TIMER_DELETE_CALL_NOT_USED
+    TXM_TRACE_ENABLE_CALL_NOT_USED
+    TXM_TRACE_INTERRUPT_CONTROL_CALL_NOT_USED
+    TXM_TRACE_ISR_ENTER_INSERT_CALL_NOT_USED
+    TXM_TRACE_ISR_EXIT_INSERT_CALL_NOT_USED
+    TXM_TRACE_USER_EVENT_INSERT_CALL_NOT_USED)
+
+set(sec_guards ${dispatch_guards})
+list(REMOVE_ITEM sec_guards ${sec_dispatchers})
+
+target_compile_definitions(threadx_module_manager_dispatch_security_test
+                           PRIVATE ${sec_guards})
+
+target_compile_options(
+  threadx_module_manager_dispatch_security_test
+  PRIVATE -Wall
+          -Wextra
+          "SHELL:-include ${SOURCE_DIR}/threadx_module_manager_load_bounds_state.h"
+          "SHELL:-include ${SOURCE_DIR}/threadx_module_manager_host_test_port.h")
+
+add_test(${CMAKE_BUILD_TYPE}::threadx_module_manager_dispatch_security_test
+         threadx_module_manager_dispatch_security_test)

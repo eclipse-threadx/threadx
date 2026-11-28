@@ -56,6 +56,30 @@ static TX_THREAD       thread_2;
 static TX_THREAD       thread_3;
 static TX_THREAD       test_thread;
 
+#if !defined(TX_INLINE_THREAD_RESUME_SUSPEND) && !defined(TX_NOT_INTERRUPTABLE)
+static TX_THREAD       resume_high_thread;
+static TX_THREAD       resume_low_thread;
+static ULONG           resume_high_stack[2048];
+static ULONG           resume_low_stack[2048];
+static volatile ULONG  resume_high_counter = 0;
+
+static void    resume_high_entry(ULONG thread_input)
+{
+    if (thread_input == 0UL)
+    {
+        resume_high_counter++;
+    }
+}
+
+static void    resume_low_entry(ULONG thread_input)
+{
+    if (thread_input != 0UL)
+    {
+        resume_high_counter++;
+    }
+}
+#endif
+
 static TX_TIMER        timer_0;
 
 
@@ -945,6 +969,49 @@ VOID            (*temp_mutex_release)(TX_THREAD *thread_ptr);
         test_control_return(1);
     }
 
+#endif
+
+#if !defined(TX_INLINE_THREAD_RESUME_SUSPEND) && !defined(TX_NOT_INTERRUPTABLE)
+    {
+    UINT    old_posture;
+    UINT    resume_status;
+    UINT    high_priority;
+    UINT    low_priority;
+
+        resume_high_counter =  0;
+        high_priority =  (thread_0.tx_thread_priority > 0U) ? (thread_0.tx_thread_priority - 1U) : 0U;
+        low_priority =   thread_0.tx_thread_priority + 1U;
+
+        resume_status =   tx_thread_create(&resume_high_thread, "resume high", resume_high_entry, 0,
+                                           resume_high_stack, (ULONG) sizeof(resume_high_stack),
+                                           high_priority, high_priority, TX_NO_TIME_SLICE, TX_DONT_START);
+        resume_status +=  tx_thread_create(&resume_low_thread, "resume low", resume_low_entry, 0,
+                                           resume_low_stack, (ULONG) sizeof(resume_low_stack),
+                                           low_priority, low_priority, TX_NO_TIME_SLICE, TX_DONT_START);
+        if (resume_status != TX_SUCCESS)
+        {
+            printf("ERROR #42\n");
+            test_control_return(1);
+        }
+
+        old_posture =  tx_interrupt_control(TX_INT_DISABLE);
+        _tx_thread_preempt_disable +=  2U;
+        tx_interrupt_control(old_posture);
+
+        _tx_thread_system_resume(&resume_high_thread);
+        _tx_thread_system_resume(&resume_low_thread);
+
+        if (resume_high_counter != 1UL)
+        {
+            printf("ERROR #43\n");
+            test_control_return(1);
+        }
+
+        tx_thread_terminate(&resume_high_thread);
+        tx_thread_terminate(&resume_low_thread);
+        tx_thread_delete(&resume_high_thread);
+        tx_thread_delete(&resume_low_thread);
+    }
 #endif
 
 #ifndef TX_INLINE_THREAD_RESUME_SUSPEND

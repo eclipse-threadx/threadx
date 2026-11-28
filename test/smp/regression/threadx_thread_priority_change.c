@@ -482,9 +482,23 @@ TX_THREAD   *temp_thread;
     thread_0.tx_thread_inherit_priority =  20;
     _tx_thread_smp_simple_priority_change(&thread_0, 16);
 
+    /* Now exercise the else branch where the new priority is lower (numerically
+       greater) than or equal to the inherited priority, so the thread priority
+       retains the inherited priority.  */
+    thread_0.tx_thread_inherit_priority =  10;
+    _tx_thread_smp_simple_priority_change(&thread_0, 16);
+    if ((thread_0.tx_thread_priority != 10) || (thread_0.tx_thread_preempt_threshold != 10))
+    {
+        printf("ERROR #15b\n");
+        test_control_return(1);
+    }
+
     /* Put the inheritance priority back to the value that means this thread is
-       not inheriting one, so nothing downstream reasons about a phantom.  */
+       not inheriting one, and restore thread priority. Align tx_thread_priority
+       with the list it currently lives in before calling the helper again.  */
+    thread_0.tx_thread_priority =          16;
     thread_0.tx_thread_inherit_priority =  TX_MAX_PRIORITIES;
+    _tx_thread_smp_simple_priority_change(&thread_0, 16);
     TX_RESTORE
 
     /* Successful test.  */

@@ -26,8 +26,11 @@ set(LAYER_INCLUDE_DIR ${REPO_ROOT}/utility/rtos_compatibility_layers/FreeRTOS)
 
 set(freertos_test_cases
     ${SOURCE_DIR}/txfr_queue_create_test.c
+    ${SOURCE_DIR}/txfr_queue_runtime_test.c
     ${SOURCE_DIR}/txfr_task_create_test.c
-    ${SOURCE_DIR}/txfr_sync_create_test.c)
+    ${SOURCE_DIR}/txfr_task_and_timer_test.c
+    ${SOURCE_DIR}/txfr_sync_create_test.c
+    ${SOURCE_DIR}/txfr_sync_runtime_test.c)
 
 # tx_api.h maps the public API onto the error checking entry points, so those
 # are the symbols that exist at link time and the ones the harness wraps.  A
